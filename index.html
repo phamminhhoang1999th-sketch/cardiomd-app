@@ -1,1662 +1,894 @@
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>CardioMD Pro</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Sora:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<style>
-:root{
-  --bg:#07090f;--bg2:#0d1117;--bg3:#111827;--surface:#141d2b;--surface2:#1a2438;
-  --border:#1e2d45;--border2:#253550;--border3:#2d4060;
-  --blue:#3b82f6;--blue2:#60a5fa;--blue3:#93c5fd;
-  --cyan:#06b6d4;--cyan2:#22d3ee;
-  --green:#10b981;--green2:#34d399;
-  --yellow:#f59e0b;--yellow2:#fbbf24;
-  --orange:#f97316;--orange2:#fb923c;
-  --red:#ef4444;--red2:#f87171;
-  --purple:#8b5cf6;--purple2:#a78bfa;
-  --pink:#ec4899;--pink2:#f472b6;
-  --text:#e2e8f0;--text2:#94a3b8;--text3:#64748b;--text4:#475569;
-  --mono:'IBM Plex Mono',monospace;
-  --sans:'Sora',sans-serif;
-  --r:12px;--r2:8px;--r3:6px;
-}
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;overflow-x:hidden}
-body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;line-height:1.5}
-
-/* SCROLLBAR */
-::-webkit-scrollbar{width:4px;height:4px}
-::-webkit-scrollbar-track{background:transparent}
-::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px}
-
-/* HEADER */
-.hdr{
-  position:fixed;top:0;left:0;right:0;z-index:200;
-  background:rgba(7,9,15,0.92);backdrop-filter:blur(16px);
-  border-bottom:1px solid var(--border);
-  display:flex;align-items:center;justify-content:space-between;
-  padding:0 16px;height:52px;
-}
-.hdr-logo{display:flex;align-items:center;gap:10px}
-.hdr-icon{
-  width:32px;height:32px;border-radius:9px;
-  background:linear-gradient(135deg,#1d4ed8,#3b82f6);
-  display:flex;align-items:center;justify-content:center;
-  box-shadow:0 0 16px rgba(59,130,246,.4);font-size:16px;
-}
-.hdr-name{font-family:var(--mono);font-size:15px;font-weight:600;letter-spacing:-.3px}
-.hdr-name span{color:var(--blue2)}
-.hdr-badge{
-  font-family:var(--mono);font-size:10px;padding:3px 8px;
-  background:rgba(6,182,212,.12);border:1px solid rgba(6,182,212,.25);
-  color:var(--cyan2);border-radius:20px;letter-spacing:.3px;
-}
-
-/* BOTTOM NAV */
-.bnav{
-  position:fixed;bottom:0;left:0;right:0;z-index:200;
-  background:rgba(7,9,15,.95);backdrop-filter:blur(16px);
-  border-top:1px solid var(--border);
-  display:flex;height:60px;
-}
-.bnav-item{
-  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:3px;cursor:pointer;transition:all .2s;border:none;background:none;
-  color:var(--text3);font-family:var(--sans);
-}
-.bnav-item.active{color:var(--blue2)}
-.bnav-icon{font-size:18px;line-height:1}
-.bnav-label{font-size:10px;font-weight:500;letter-spacing:.2px}
-
-/* MAIN */
-.main{padding:52px 0 60px;min-height:100vh}
-.page{display:none;animation:fadeUp .2s ease}
-.page.active{display:block}
-@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-
-.wrap{max-width:720px;margin:0 auto;padding:16px}
-
-/* TYPOGRAPHY */
-.page-title{
-  font-family:var(--mono);font-size:11px;color:var(--text3);
-  text-transform:uppercase;letter-spacing:1.2px;margin-bottom:16px;
-  display:flex;align-items:center;gap:8px;
-}
-.page-title::after{content:'';flex:1;height:1px;background:var(--border)}
-
-/* CARDS */
-.card{
-  background:var(--surface);border:1px solid var(--border);
-  border-radius:var(--r);padding:16px;margin-bottom:12px;
-  transition:border-color .2s;
-}
-.card:hover{border-color:var(--border2)}
-.card-title{font-weight:600;font-size:14px;margin-bottom:4px;display:flex;align-items:center;gap:8px}
-.card-sub{font-size:11px;color:var(--text3);font-family:var(--mono)}
-
-/* BADGES */
-.badge{font-family:var(--mono);font-size:10px;padding:2px 7px;border-radius:4px;font-weight:500;white-space:nowrap}
-.b-blue{background:rgba(59,130,246,.15);color:var(--blue2);border:1px solid rgba(59,130,246,.25)}
-.b-green{background:rgba(16,185,129,.15);color:var(--green2);border:1px solid rgba(16,185,129,.25)}
-.b-yellow{background:rgba(245,158,11,.15);color:var(--yellow2);border:1px solid rgba(245,158,11,.25)}
-.b-red{background:rgba(239,68,68,.15);color:var(--red2);border:1px solid rgba(239,68,68,.25)}
-.b-purple{background:rgba(139,92,246,.15);color:var(--purple2);border:1px solid rgba(139,92,246,.25)}
-.b-orange{background:rgba(249,115,22,.15);color:var(--orange2);border:1px solid rgba(249,115,22,.25)}
-.b-cyan{background:rgba(6,182,212,.15);color:var(--cyan2);border:1px solid rgba(6,182,212,.25)}
-.b-pink{background:rgba(236,72,153,.15);color:var(--pink2);border:1px solid rgba(236,72,153,.25)}
-
-/* BUTTONS */
-.btn{
-  display:inline-flex;align-items:center;gap:7px;
-  padding:10px 18px;border-radius:var(--r2);border:none;
-  font-family:var(--sans);font-size:13px;font-weight:600;cursor:pointer;
-  transition:all .15s;white-space:nowrap;
-}
-.btn-primary{
-  background:linear-gradient(135deg,#2563eb,#3b82f6);color:#fff;
-  box-shadow:0 4px 12px rgba(59,130,246,.3);
-}
-.btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(59,130,246,.4)}
-.btn-primary:active{transform:translateY(0)}
-.btn-outline{background:transparent;color:var(--text2);border:1px solid var(--border2)}
-.btn-outline:hover{border-color:var(--blue);color:var(--text)}
-.btn-ghost{background:transparent;color:var(--text3);border:1px solid var(--border);font-size:12px;padding:7px 12px}
-.btn-ghost:hover{color:var(--text2);border-color:var(--border2)}
-.btn-danger{background:rgba(239,68,68,.15);color:var(--red2);border:1px solid rgba(239,68,68,.25)}
-.btn-danger:hover{background:rgba(239,68,68,.25)}
-.btn-success{background:rgba(16,185,129,.15);color:var(--green2);border:1px solid rgba(16,185,129,.25)}
-.btn-success:hover{background:rgba(16,185,129,.25)}
-.btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
-
-/* FORM */
-.field{margin-bottom:12px}
-.field-label{font-size:11px;font-weight:600;color:var(--text2);letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px;display:block}
-.input{
-  width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r2);
-  color:var(--text);font-family:var(--sans);font-size:14px;padding:10px 12px;outline:none;
-  transition:border-color .2s;
-}
-.input:focus{border-color:var(--blue)}
-.input::placeholder{color:var(--text4)}
-.input-sm{padding:7px 10px;font-size:13px}
-select.input{cursor:pointer}
-
-/* CHECKBOX ITEM */
-.chk-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-@media(max-width:480px){.chk-grid{grid-template-columns:1fr}}
-.chk{
-  display:flex;align-items:center;gap:10px;
-  padding:10px 12px;background:var(--bg3);border:1px solid var(--border);
-  border-radius:var(--r2);cursor:pointer;transition:all .15s;user-select:none;
-}
-.chk:hover{border-color:var(--border2)}
-.chk.on{border-color:var(--blue);background:rgba(59,130,246,.08)}
-.chk input{display:none}
-.chk-box{
-  width:18px;height:18px;border:2px solid var(--border2);border-radius:4px;
-  flex-shrink:0;display:flex;align-items:center;justify-content:center;
-  font-size:10px;transition:all .15s;
-}
-.chk.on .chk-box{background:var(--blue);border-color:var(--blue);color:#fff}
-.chk-text{flex:1;font-size:13px;color:var(--text)}
-.chk-pt{font-family:var(--mono);font-size:11px;color:var(--text3);background:var(--surface2);padding:2px 6px;border-radius:4px}
-
-/* RADIO ROW */
-.radio-wrap{display:flex;gap:6px;flex-wrap:wrap}
-.rbtn{
-  padding:7px 13px;background:var(--bg3);border:1px solid var(--border);
-  border-radius:var(--r2);font-size:12px;font-family:var(--mono);color:var(--text2);
-  cursor:pointer;transition:all .15s;white-space:nowrap;
-}
-.rbtn:hover{border-color:var(--border2)}
-.rbtn.on{background:rgba(59,130,246,.1);border-color:var(--blue);color:var(--blue2);font-weight:600}
-
-/* RESULT BOX */
-.result-box{
-  background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);
-  padding:16px;margin-top:14px;display:none;
-}
-.result-box.show{display:block;animation:fadeUp .25s ease}
-.result-score{font-family:var(--mono);font-size:48px;font-weight:600;line-height:1;margin-bottom:4px}
-.result-label{font-size:12px;color:var(--text2);margin-bottom:12px;font-family:var(--mono)}
-.risk-strip{padding:12px;border-radius:var(--r2);font-size:13px;line-height:1.6;margin-bottom:12px}
-.r-low{background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.25);color:var(--green2)}
-.r-mod{background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.25);color:var(--yellow2)}
-.r-high{background:rgba(249,115,22,.1);border:1px solid rgba(249,115,22,.25);color:var(--orange2)}
-.r-vhigh{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.25);color:var(--red2)}
-.rec-title{font-family:var(--mono);font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
-.rec-list{list-style:none;display:flex;flex-direction:column;gap:5px}
-.rec-list li{font-size:13px;color:var(--text2);padding-left:14px;position:relative;line-height:1.5}
-.rec-list li::before{content:'→';position:absolute;left:0;color:var(--blue)}
-
-/* SCORE SELECTOR */
-.score-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;margin-bottom:14px}
-.sc{
-  background:var(--surface);border:1px solid var(--border);border-radius:var(--r);
-  padding:12px 14px;cursor:pointer;transition:all .15s;
-}
-.sc:hover,.sc.on{border-color:var(--blue);background:rgba(59,130,246,.06)}
-.sc-name{font-weight:700;font-size:14px;color:var(--text)}
-.sc-use{font-size:11px;color:var(--text3);margin-top:2px;font-family:var(--mono)}
-
-/* CALC PANELS */
-.calc{display:none}
-.calc.show{display:block;animation:fadeUp .2s ease}
-.calc-header{
-  display:flex;align-items:center;gap:10px;margin-bottom:14px;
-  padding-bottom:12px;border-bottom:1px solid var(--border);
-}
-.calc-title{font-size:16px;font-weight:700}
-.calc-source{font-family:var(--mono);font-size:10px;color:var(--text3)}
-
-/* DRUGS */
-.search-wrap{position:relative;margin-bottom:12px}
-.search-wrap .ico{position:absolute;right:12px;top:50%;transform:translateY(-50%);color:var(--text3)}
-.filter-bar{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
-.fchip{
-  padding:5px 11px;background:var(--surface);border:1px solid var(--border);
-  border-radius:20px;font-size:12px;color:var(--text2);cursor:pointer;transition:all .15s;white-space:nowrap;
-}
-.fchip:hover{border-color:var(--border2)}
-.fchip.on{background:rgba(59,130,246,.1);border-color:var(--blue);color:var(--blue2);font-weight:600}
-
-.dcard{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);margin-bottom:8px;overflow:hidden}
-.dcard:hover{border-color:var(--border2)}
-.d-head{padding:12px 14px;cursor:pointer;display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
-.d-name{font-weight:700;font-size:15px}
-.d-gen{font-size:11px;color:var(--text3);font-family:var(--mono);margin-top:2px}
-.d-tags{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px}
-.darrow{color:var(--text3);transition:transform .2s;font-size:11px;flex-shrink:0;margin-top:4px}
-.dcard.open .darrow{transform:rotate(180deg)}
-.d-body{max-height:0;overflow:hidden;transition:max-height .3s ease}
-.dcard.open .d-body{max-height:800px}
-.d-inner{padding:0 14px 14px}
-.dtable{width:100%;border-collapse:collapse;font-size:13px;margin-top:8px}
-.dtable tr{border-bottom:1px solid var(--border)}
-.dtable tr:last-child{border-bottom:none}
-.dtable td{padding:7px 4px;vertical-align:top}
-.dtable td:first-child{color:var(--text3);font-family:var(--mono);font-size:11px;width:95px;padding-right:12px;white-space:nowrap}
-.dtable td:last-child{color:var(--text);line-height:1.5}
-.warn-box{margin-top:10px;padding:10px 12px;background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.2);border-radius:var(--r2);font-size:12px;color:var(--red2);line-height:1.5}
-.info-box{margin-top:8px;padding:10px 12px;background:rgba(59,130,246,.07);border:1px solid rgba(59,130,246,.2);border-radius:var(--r2);font-size:12px;color:var(--blue3);line-height:1.5}
-
-/* PROTOCOLS */
-.proto-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
-.ptab{padding:7px 14px;background:var(--surface);border:1px solid var(--border);border-radius:20px;font-size:12px;font-weight:500;color:var(--text2);cursor:pointer;transition:all .15s;white-space:nowrap}
-.ptab.on{background:rgba(59,130,246,.1);border-color:var(--blue);color:var(--blue2)}
-.proto{display:none}
-.proto.show{display:block;animation:fadeUp .2s ease}
-.step{display:flex;gap:12px;margin-bottom:0}
-.step-line{display:flex;flex-direction:column;align-items:center;flex-shrink:0}
-.sdot{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-family:var(--mono);font-weight:700;flex-shrink:0;position:relative;z-index:1}
-.sline{width:2px;flex:1;min-height:16px;background:var(--border);margin:2px 0}
-.sbody{flex:1;padding-bottom:16px}
-.s-title{font-weight:600;font-size:14px;color:var(--text);margin-bottom:6px;padding-top:3px}
-.s-content{font-size:12px;color:var(--text2);line-height:1.65;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r2);padding:12px}
-.s-content ul{padding-left:16px}
-.s-content li{margin-bottom:5px}
-.s-content strong{color:var(--text)}
-.s-content code{background:var(--surface2);padding:1px 5px;border-radius:3px;font-family:var(--mono);font-size:11px;color:var(--cyan2)}
-
-/* PATIENTS */
-.pat-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
-.pstat{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:12px;text-align:center}
-.pstat-num{font-family:var(--mono);font-size:24px;font-weight:600}
-.pstat-lbl{font-size:11px;color:var(--text3);margin-top:2px}
-
-.pat-card{
-  background:var(--surface);border:1px solid var(--border);border-radius:var(--r);
-  padding:14px;margin-bottom:8px;cursor:pointer;transition:border-color .15s;
-}
-.pat-card:hover{border-color:var(--border2)}
-.pat-row{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
-.pat-name{font-weight:700;font-size:15px}
-.pat-meta{font-size:12px;color:var(--text2);margin-top:2px}
-.pat-scores{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
-.pat-score-tag{font-family:var(--mono);font-size:11px;padding:3px 8px;border-radius:4px;background:var(--bg3);border:1px solid var(--border);color:var(--text2)}
-
-.pat-form{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:12px}
-.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-@media(max-width:420px){.form-grid{grid-template-columns:1fr}}
-
-.pat-detail{background:var(--surface);border:1px solid var(--blue);border-radius:var(--r);padding:16px;margin-bottom:12px;display:none}
-.pat-detail.show{display:block;animation:fadeUp .2s ease}
-.pd-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px}
-.pd-name{font-size:18px;font-weight:700}
-.pd-info{font-size:12px;color:var(--text2);margin-top:3px;font-family:var(--mono)}
-.pd-section{margin-bottom:14px}
-.pd-sec-title{font-family:var(--mono);font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px}
-.pd-score-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px}
-.pd-sc{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r2);padding:10px;text-align:center}
-.pd-sc-name{font-size:11px;color:var(--text3);font-family:var(--mono);margin-bottom:4px}
-.pd-sc-val{font-family:var(--mono);font-size:20px;font-weight:600}
-.pd-sc-risk{font-size:11px;margin-top:3px}
-.note-area{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r2);color:var(--text);font-family:var(--sans);font-size:13px;padding:10px 12px;resize:vertical;min-height:80px;outline:none;transition:border-color .2s}
-.note-area:focus{border-color:var(--blue)}
-
-/* HOME */
-.home-hero{
-  background:linear-gradient(135deg,#0a1525 0%,#0d1117 100%);
-  border:1px solid var(--border);border-radius:var(--r);padding:20px;margin-bottom:14px;
-  position:relative;overflow:hidden;
-}
-.home-hero::before{
-  content:'';position:absolute;width:250px;height:250px;
-  background:radial-gradient(circle,rgba(59,130,246,.12) 0%,transparent 70%);
-  right:-80px;top:-80px;pointer-events:none;
-}
-.hero-title{font-size:20px;font-weight:700;line-height:1.3;margin-bottom:6px}
-.hero-sub{font-size:13px;color:var(--text2);margin-bottom:16px}
-.quick-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
-@media(max-width:400px){.quick-grid{grid-template-columns:repeat(2,1fr)}}
-.qbtn{
-  background:var(--surface2);border:1px solid var(--border);border-radius:var(--r2);
-  padding:12px 8px;text-align:center;cursor:pointer;transition:all .15s;display:flex;flex-direction:column;align-items:center;gap:6px;
-}
-.qbtn:hover{border-color:var(--blue);background:rgba(59,130,246,.06);transform:translateY(-2px)}
-.qbtn:active{transform:translateY(0)}
-.qbtn-ico{font-size:20px}
-.qbtn-lbl{font-size:11px;font-weight:600;color:var(--text2)}
-
-.recent-row{display:flex;flex-direction:column;gap:6px}
-.rec-item{
-  background:var(--surface);border:1px solid var(--border);border-radius:var(--r2);
-  padding:11px 13px;display:flex;align-items:center;justify-content:space-between;gap:10px;
-  cursor:pointer;transition:border-color .15s;
-}
-.rec-item:hover{border-color:var(--border2)}
-.ri-title{font-size:13px;font-weight:600}
-.ri-desc{font-size:11px;color:var(--text3);margin-top:2px;font-family:var(--mono)}
-
-.disclaimer{background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.2);border-radius:var(--r2);padding:10px 12px;font-size:12px;color:var(--yellow2);line-height:1.5;margin-bottom:14px}
-
-/* NISSH SPECIAL */
-.nissh-meter{margin:14px 0;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:14px}
-.meter-track{height:10px;background:var(--surface2);border-radius:5px;overflow:hidden;margin:8px 0}
-.meter-fill{height:100%;border-radius:5px;transition:width .5s ease,background .3s}
-.meter-markers{display:flex;justify-content:space-between;font-family:var(--mono);font-size:10px;color:var(--text3);margin-top:4px}
-
-/* SEPARATOR */
-.sep{border:none;border-top:1px solid var(--border);margin:14px 0}
-
-/* EMPTY STATE */
-.empty{text-align:center;padding:40px 20px;color:var(--text3)}
-.empty-ico{font-size:40px;margin-bottom:10px}
-.empty-txt{font-size:14px}
-.empty-sub{font-size:12px;margin-top:4px;color:var(--text4)}
-
-/* TOAST */
-.toast{
-  position:fixed;bottom:70px;left:50%;transform:translateX(-50%) translateY(10px);
-  background:var(--surface2);border:1px solid var(--border2);border-radius:var(--r2);
-  padding:10px 16px;font-size:13px;font-weight:500;color:var(--text);
-  opacity:0;transition:all .3s;pointer-events:none;z-index:999;white-space:nowrap;
-  box-shadow:0 8px 24px rgba(0,0,0,.5);
-}
-.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-
-/* MODAL OVERLAY */
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);z-index:300;display:none;align-items:center;justify-content:center;padding:16px}
-.modal-overlay.show{display:flex}
-.modal{background:var(--surface);border:1px solid var(--border2);border-radius:var(--r);width:100%;max-width:480px;max-height:85vh;overflow-y:auto;padding:20px}
-.modal-title{font-size:16px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between}
-.modal-close{color:var(--text3);cursor:pointer;font-size:20px;line-height:1;background:none;border:none;color:var(--text3)}
-.modal-close:hover{color:var(--text)}
-
-@media(min-width:640px){
-  .score-grid{grid-template-columns:repeat(auto-fill,minmax(180px,1fr))}
-  .hero-title{font-size:24px}
-}
-</style>
-</head>
-<body>
-
-<!-- HEADER -->
-<div class="hdr">
-  <div class="hdr-logo">
-    <div class="hdr-icon">❤️</div>
-    <div>
-      <div class="hdr-name">Cardio<span>MD</span></div>
-    </div>
-  </div>
-  <div class="hdr-badge">Pro · ESC/ACC 2024</div>
-</div>
-
-<!-- MAIN -->
-<div class="main">
-
-<!-- ═══ HOME ═══ -->
-<div id="pg-home" class="page active">
-<div class="wrap">
-  <div class="home-hero">
-    <div class="hero-title">Lâm sàng Tim mạch<br>trong tầm tay bạn</div>
-    <div class="hero-sub">Bảng điểm · Thuốc · Phác đồ · Theo dõi bệnh nhân</div>
-    <div class="quick-grid">
-      <div class="qbtn" onclick="goPage('scores')"><div class="qbtn-ico">📊</div><div class="qbtn-lbl">Bảng điểm</div></div>
-      <div class="qbtn" onclick="goPage('drugs')"><div class="qbtn-ico">💊</div><div class="qbtn-lbl">Tra thuốc</div></div>
-      <div class="qbtn" onclick="goPage('protocols')"><div class="qbtn-ico">📋</div><div class="qbtn-lbl">Phác đồ</div></div>
-      <div class="qbtn" onclick="goPage('patients')"><div class="qbtn-ico">👤</div><div class="qbtn-lbl">Bệnh nhân</div></div>
-    </div>
-  </div>
-
-  <div class="pat-stats">
-    <div class="pstat"><div class="pstat-num" style="color:var(--blue2)" id="hs-scores">9</div><div class="pstat-lbl">Bảng điểm</div></div>
-    <div class="pstat"><div class="pstat-num" style="color:var(--green2)" id="hs-drugs">28</div><div class="pstat-lbl">Thuốc</div></div>
-    <div class="pstat"><div class="pstat-num" style="color:var(--yellow2)" id="hs-pts">0</div><div class="pstat-lbl">Bệnh nhân</div></div>
-  </div>
-
-  <div class="page-title">Truy cập nhanh</div>
-  <div class="recent-row">
-    <div class="rec-item" onclick="goPage('scores');setTimeout(()=>openCalc('chads'),80)">
-      <div><div class="ri-title">CHA₂DS₂-VASc</div><div class="ri-desc">Nguy cơ đột quỵ · Rung nhĩ</div></div>
-      <span class="badge b-blue">Score</span>
-    </div>
-    <div class="rec-item" onclick="goPage('scores');setTimeout(()=>openCalc('grace'),80)">
-      <div><div class="ri-title">GRACE Score</div><div class="ri-desc">Tử vong nội viện · ACS</div></div>
-      <span class="badge b-orange">Score</span>
-    </div>
-    <div class="rec-item" onclick="goPage('scores');setTimeout(()=>openCalc('nissh'),80)">
-      <div><div class="ri-title">NISSH Score</div><div class="ri-desc">Suy tim · Đánh giá nội khoa</div></div>
-      <span class="badge b-cyan">Score</span>
-    </div>
-    <div class="rec-item" onclick="goPage('protocols');setTimeout(()=>openProto('hf'),80)">
-      <div><div class="ri-title">Phác đồ Suy tim HFrEF</div><div class="ri-desc">ESC 2021 · Tứ trụ điều trị</div></div>
-      <span class="badge b-green">Guideline</span>
-    </div>
-    <div class="rec-item" onclick="goPage('protocols');setTimeout(()=>openProto('stemi'),80)">
-      <div><div class="ri-title">Phác đồ STEMI</div><div class="ri-desc">ACC/AHA 2022 · Cửa sổ 90 phút</div></div>
-      <span class="badge b-red">Khẩn</span>
-    </div>
-  </div>
-
-  <div class="sep"></div>
-  <div class="disclaimer">⚕️ <strong>Lưu ý lâm sàng:</strong> Ứng dụng hỗ trợ quyết định lâm sàng, không thay thế phán đoán của bác sĩ. Quyết định điều trị cuối cùng thuộc về bác sĩ phụ trách.</div>
-</div>
-</div>
-
-<!-- ═══ SCORES ═══ -->
-<div id="pg-scores" class="page">
-<div class="wrap">
-  <div class="page-title">Bảng điểm Tim mạch</div>
-  <div class="score-grid" id="score-selector">
-    <div class="sc" id="sc-chads" onclick="openCalc('chads')"><div class="sc-name">CHA₂DS₂-VASc</div><div class="sc-use">Đột quỵ · Rung nhĩ</div></div>
-    <div class="sc" id="sc-hasbled" onclick="openCalc('hasbled')"><div class="sc-name">HAS-BLED</div><div class="sc-use">Chảy máu · Kháng đông</div></div>
-    <div class="sc" id="sc-grace" onclick="openCalc('grace')"><div class="sc-name">GRACE</div><div class="sc-use">Tử vong · ACS / NSTEMI</div></div>
-    <div class="sc" id="sc-timi" onclick="openCalc('timi')"><div class="sc-name">TIMI (STEMI)</div><div class="sc-use">30 ngày · STEMI</div></div>
-    <div class="sc" id="sc-wells" onclick="openCalc('wells')"><div class="sc-name">Wells (PE)</div><div class="sc-use">Thuyên tắc phổi</div></div>
-    <div class="sc" id="sc-framingham" onclick="openCalc('framingham')"><div class="sc-name">Framingham</div><div class="sc-use">Nguy cơ CVD 10 năm</div></div>
-    <div class="sc" id="sc-nyha" onclick="openCalc('nyha')"><div class="sc-name">NYHA / ACC</div><div class="sc-use">Phân độ suy tim</div></div>
-    <div class="sc" id="sc-killip" onclick="openCalc('killip')"><div class="sc-name">Killip</div><div class="sc-use">Suy tim trong NMCT</div></div>
-    <div class="sc" id="sc-nissh" onclick="openCalc('nissh')"><div class="sc-name">NISSH</div><div class="sc-use">Suy tim · Nội khoa</div></div>
-  </div>
-
-  <!-- CHA2DS2-VASc -->
-  <div class="calc card" id="calc-chads">
-    <div class="calc-header">
-      <div><div class="calc-title">🫀 CHA₂DS₂-VASc</div><div class="calc-source">ESC 2023 · Rung nhĩ không do van</div></div>
-      <span class="badge b-blue">0–9 điểm</span>
-    </div>
-    <div class="chk-grid">
-      <label class="chk" onclick="tgl(this)"><input type="checkbox" value="1"><div class="chk-box">✓</div><div class="chk-text">Suy tim / EF giảm (C)</div><span class="chk-pt">+1</span></label>
-      <label class="chk" onclick="tgl(this)"><input type="checkbox" value="1"><div class="chk-box">✓</div><div class="chk-text">Tăng huyết áp (H)</div><span class="chk-pt">+1</span></label>
-      <label class="chk" onclick="tgl(this)"><input type="checkbox" value="2"><div class="chk-box">✓</div><div class="chk-text">Tuổi ≥ 75 (A₂)</div><span class="chk-pt">+2</span></label>
-      <label class="chk" onclick="tgl(this)"><input type="checkbox" value="1"><div class="chk-box">✓</div><div class="chk-text">Đái tháo đường (D)</div><span class="chk-pt">+1</span></label>
-      <label class="chk" onclick="tgl(this)"><input type="checkbox" value="2"><div class="chk-box">✓</div><div class="chk-text">Đột quỵ / TIA / TE (S₂)</div><span class="chk-pt">+2</span></label>
-      <label class="chk" onclick="tgl(this)"><input type="checkbox" value="1"><div class="chk-box">✓</div><div class="chk-text">Bệnh mạch máu (V)</div><span class="chk-pt">+1</span></label>
-      <label class="chk" onclick="tgl(this)"><input type="checkbox" value="1"><div class="chk-box">✓</div><div class="chk-text">Tuổi 65–74 (A)</div><span class="chk-pt">+1</span></label>
-      <label class="chk" onclick="tgl(this)"><input type="checkbox" value="1"><div class="chk-box">✓</div><div class="chk-text">Nữ giới (Sc)</div><span class="chk-pt">+1</span></label>
-    </div>
-    <div class="btn-row">
-      <button class="btn btn-primary" onclick="calcChads()">⚡ Tính điểm</button>
-      <button class="btn btn-ghost" onclick="resetCalc('chads')">↺ Đặt lại</button>
-    </div>
-    <div class="result-box" id="res-chads">
-      <div class="result-score" id="rn-chads" style="color:var(--blue2)">0</div>
-      <div class="result-label">CHA₂DS₂-VASc Score</div>
-      <div class="risk-strip" id="ri-chads"></div>
-      <div class="rec-title">Khuyến cáo ESC 2023</div>
-      <ul class="rec-list" id="rc-chads"></ul>
-    </div>
-  </div>
-
-  <!-- HAS-BLED -->
-  <div class="calc card" id="calc-hasbled">
-    <div class="calc-header">
-      <div><div class="calc-title">🩸 HAS-BLED</div><div class="calc-source">Nguy cơ chảy máu nặng · Bệnh nhân kháng đông</div></div>
-      <span class="badge b-red">0–9 điểm</span>
-    </div>
-    <div class="chk-grid">
-      <label class="chk" onclick="tgl(this)"><input type="checkbox" value="1"><div class="chk-box">✓</div><div class="chk-text">THA không kiểm soát (H)</div><span class="chk-pt">+1</span></label>
-      <label class="chk" onclick="tgl(this)"><input type="checkbox" value="2"><div class="chk-box">✓</div><div class="chk-text">Suy thận và/hoặc gan (A)</div><span class="chk-pt">+1/2</span></label>
-      <label class="chk" onclick="tgl(this)"><input type="checkbox" value="1"><div class="chk-box">✓</div><div class="chk-text">Tiền sử đột quỵ (S)</div><span class="chk-pt">+1</span></label>
-      <label class="chk" onclick="tgl(this)"><input type="checkbox" value="1"><div class="chk-box">✓</div><div class="chk-text">Tiền sử / xu hướng chảy máu (B)</div><span class="chk-pt">+1</span></label>
-      <label class="chk" onclick="tgl(this)"><input type="checkbox" value="1"><div class="chk-box">✓</div><div class="chk-text">INR không ổn định (L)</div><span class="chk-pt">+1</span></label>
-      <label class="chk" onclick="tgl(this)"><input type="checkbox" value="1"><div class="chk-box">✓</div><div class="chk-text">Tuổi > 65 (E)</div><span class="chk-pt">+1</span></label>
-      <label class="chk" onclick="tgl(this)"><input type="checkbox" value="2"><div class="chk-box">✓</div><div class="chk-text">NSAIDs hoặc rượu (D)</div><span class="chk-pt">+1/2</span></label>
-    </div>
-    <div class="btn-row">
-      <button class="btn btn-primary" onclick="calcHasbled()">⚡ Tính điểm</button>
-      <button class="btn btn-ghost" onclick="resetCalc('hasbled')">↺ Đặt lại</button>
-    </div>
-    <div class="result-box" id="res-hasbled">
-      <div class="result-score" id="rn-hasbled" style="color:var(--red2)">0</div>
-      <div class="result-label">HAS-BLED Score</div>
-      <div class="risk-strip" id="ri-hasbled"></div>
-      <div class="rec-title">Hướng xử trí</div>
-      <ul class="rec-list" id="rc-hasbled"></ul>
-    </div>
-  </div>
-
-  <!-- GRACE -->
-  <div class="calc card" id="calc-grace">
-    <div class="calc-header">
-      <div><div class="calc-title">🫀 GRACE Score</div><div class="calc-source">Tử vong nội viện & 6 tháng · ACS / NSTEMI</div></div>
-      <span class="badge b-orange">ACS Risk</span>
-    </div>
-    <div class="field"><label class="field-label">Nhóm tuổi</label>
-    <div class="radio-wrap" id="gr-age">
-      <div class="rbtn" data-val="0">&lt;40</div><div class="rbtn" data-val="18">40–49</div><div class="rbtn" data-val="36">50–59</div><div class="rbtn" data-val="55">60–69</div><div class="rbtn" data-val="73">70–79</div><div class="rbtn" data-val="91">≥80</div>
-    </div></div>
-    <div class="field"><label class="field-label">Huyết áp tâm thu (mmHg)</label>
-    <div class="radio-wrap" id="gr-sbp">
-      <div class="rbtn" data-val="58">&lt;80</div><div class="rbtn" data-val="53">80–99</div><div class="rbtn" data-val="43">100–119</div><div class="rbtn" data-val="34">120–139</div><div class="rbtn" data-val="24">140–159</div><div class="rbtn" data-val="10">160–199</div><div class="rbtn" data-val="0">≥200</div>
-    </div></div>
-    <div class="field"><label class="field-label">Nhịp tim (lần/phút)</label>
-    <div class="radio-wrap" id="gr-hr">
-      <div class="rbtn" data-val="0">&lt;70</div><div class="rbtn" data-val="3">70–89</div><div class="rbtn" data-val="9">90–109</div><div class="rbtn" data-val="15">110–149</div><div class="rbtn" data-val="24">150–199</div><div class="rbtn" data-val="38">≥200</div>
-    </div></div>
-    <div class="field"><label class="field-label">Creatinine (mg/dL)</label>
-    <div class="radio-wrap" id="gr-cr">
-      <div class="rbtn" data-val="1">0–0.39</div><div class="rbtn" data-val="4">0.4–0.79</div><div class="rbtn" data-val="7">0.8–1.19</div><div class="rbtn" data-val="10">1.2–1.59</div><div class="rbtn" data-val="13">1.6–1.99</div><div class="rbtn" data-val="21">2.0–3.99</div><div class="rbtn" data-val="28">≥4</div>
-    </div></div>
-    <div class="chk-grid" style="margin-top:8px">
-      <label class="chk" onclick="tgl(this)"><input type="checkbox" value="20"><div class="chk-box">✓</div><div class="chk-text">Killip class II</div><span class="chk-pt">+20</span></label>
-      <label class="chk" onclick="tgl(this)"><input type="checkbox" value="39"><div class="chk-box">✓</div><div class="chk-text">Killip class III</div><span class="chk-pt">+39</span></label>
-      <label class="chk" onclick="tgl(this)"><input type="checkbox" value="59"><div class="chk-box">✓</div><div class="chk-text">Killip class IV</div><span class="chk-pt">+59</span></label>
-      <label class="chk" onclick="tgl(this)"><input type="checkbox" value="15"><div class="chk-box">✓</div><div class="chk-text">ST chênh lên</div><span class="chk-pt">+15</span></label>
-      <label class="chk" onclick="tgl(this)"><input type="checkbox" value="39"><div class="chk-box">✓</div><div class="chk-text">Ngừng tim khi nhập viện</div><span class="chk-pt">+39</span></label>
-      <label class="chk" onclick="tgl(this)"><input type="checkbox" value="14"><div class="chk-box">✓</div><div class="chk-text">Men tim tăng</div><span class="chk-pt">+14</span></label>
-    </div>
-    <div class="btn-row">
-      <button class="btn btn-primary" onclick="calcGrace()">⚡ Tính điểm</button>
-      <button class="btn btn-ghost" onclick="resetCalc('grace')">↺ Đặt lại</button>
-    </div>
-    <div class="result-box" id="res-grace">
-      <div class="result-score" id="rn-grace" style="color:var(--orange2)">0</div>
-      <div class="result-label">GRACE Score</div>
-      <div class="risk-strip" id="ri-grace"></div>
-      <div class="rec-title">Chiến lược điều trị</div>
-      <ul class="rec-list" id="rc-grace"></ul>
-    </div>
-  </div>
-
-  <!-- TIMI STEMI -->
-  <div class="calc card" id="calc-timi">
-    <div class="calc-header">
-      <div><div class="calc-title">💥 TIMI Risk Score (STEMI)</div><div class="calc-source">Tử vong 30 ngày · STEMI</div></div>
-      <span class="badge b-red">STEMI</span>
-    </div>
-    <div class="chk-grid">
-      <label class="chk" onclick="tgl(this)"><input type="checkbox" value="2"><div class="chk-box">✓</div><div class="chk-text">Tuổi 65–74</div><span class="chk-pt">+2</span></label>
-      <label class="chk" onclick="tgl(this)"><input type="checkbox" value="3"><div class="chk-box">✓</div><div class="chk-text">Tuổi ≥ 75</div><span class="chk-pt">+3</span></label>
-      <label class="chk" onclick="tgl(this)"><input type="checkbox" value="1"><div class="chk-box">✓</div><div class="chk-text">ĐTĐ / THA / Đau thắt ngực</div><span class="chk-pt">+1</span></label>
-      <label class="chk" onclick="tgl(this)"><input type="checkbox" value="1"><div class="chk-box">✓</div><div class="chk-text">ST chênh trước hoặc LBBB</div><span class="chk-pt">+1</span></label>
-      <label class="chk" onclick="tgl(this)"><input type="checkbox" value="2"><div class="chk-box">✓</div><div class="chk-text">Tiêu sợi huyết muộn > 4h</div><span class="chk-pt">+2</span></label>
-      <label class="chk" onclick="tgl(this)"><input type="checkbox" value="2"><div class="chk-box">✓</div><div class="chk-text">Killip II–IV</div><span class="chk-pt">+2</span></label>
-      <label class="chk" onclick="tgl(this)"><input type="checkbox" value="1"><div class="chk-box">✓</div><div class="chk-text">Cân nặng &lt; 67 kg</div><span class="chk-pt">+1</span></label>
-      <label class="chk" onclick="tgl(this)"><input type="checkbox" value="3"><div class="chk-box">✓</div><div class="chk-text">HA tâm thu &lt; 100 mmHg</div><span class="chk-pt">+3</span></label>
-      <label class="chk" onclick="tgl(this)"><input type="checkbox" value="2"><div class="chk-box">✓</div><div class="chk-text">Nhịp tim &gt; 100 lần/phút</div><span class="chk-pt">+2</span></label>
-    </div>
-    <div class="btn-row">
-      <button class="btn btn-primary" onclick="calcTimi()">⚡ Tính điểm</button>
-      <button class="btn btn-ghost" onclick="resetCalc('timi')">↺ Đặt lại</button>
-    </div>
-    <div class="result-box" id="res-timi">
-      <div class="result-score" id="rn-timi" style="color:var(--red2)">0</div>
-      <div class="result-label">TIMI Score (STEMI)</div>
-      <div class="risk-strip" id="ri-timi"></div>
-    </div>
-  </div>
-
-  <!-- WELLS PE -->
-  <div class="calc card" id="calc-wells">
-    <div class="calc-header">
-      <div><div class="calc-title">🫁 Wells Score (PE)</div><div class="calc-source">Xác suất lâm sàng Thuyên tắc phổi</div></div>
-      <span class="badge b-purple">Wells</span>
-    </div>
-    <div class="chk-grid">
-      <label class="chk" onclick="tgl(this)"><input type="checkbox" value="3"><div class="chk-box">✓</div><div class="chk-text">Lâm sàng nghi DVT</div><span class="chk-pt">+3</span></label>
-      <label class="chk" onclick="tgl(this)"><input type="checkbox" value="3"><div class="chk-box">✓</div><div class="chk-text">PE là chẩn đoán khả năng nhất</div><span class="chk-pt">+3</span></label>
-      <label class="chk" onclick="tgl(this)"><input type="checkbox" value="1.5"><div class="chk-box">✓</div><div class="chk-text">Nhịp tim &gt; 100 l/phút</div><span class="chk-pt">+1.5</span></label>
-      <label class="chk" onclick="tgl(this)"><input type="checkbox" value="1.5"><div class="chk-box">✓</div><div class="chk-text">Bất động / PT &lt; 4 tuần</div><span class="chk-pt">+1.5</span></label>
-      <label class="chk" onclick="tgl(this)"><input type="checkbox" value="1.5"><div class="chk-box">✓</div><div class="chk-text">Tiền sử DVT / PE</div><span class="chk-pt">+1.5</span></label>
-      <label class="chk" onclick="tgl(this)"><input type="checkbox" value="1"><div class="chk-box">✓</div><div class="chk-text">Ho ra máu</div><span class="chk-pt">+1</span></label>
-      <label class="chk" onclick="tgl(this)"><input type="checkbox" value="1"><div class="chk-box">✓</div><div class="chk-text">Bệnh ác tính đang điều trị</div><span class="chk-pt">+1</span></label>
-    </div>
-    <div class="btn-row">
-      <button class="btn btn-primary" onclick="calcWells()">⚡ Tính điểm</button>
-      <button class="btn btn-ghost" onclick="resetCalc('wells')">↺ Đặt lại</button>
-    </div>
-    <div class="result-box" id="res-wells">
-      <div class="result-score" id="rn-wells" style="color:var(--purple2)">0</div>
-      <div class="result-label">Wells Score (PE)</div>
-      <div class="risk-strip" id="ri-wells"></div>
-      <div class="rec-title">Xử trí tiếp theo</div>
-      <ul class="rec-list" id="rc-wells"></ul>
-    </div>
-  </div>
-
-  <!-- FRAMINGHAM -->
-  <div class="calc card" id="calc-framingham">
-    <div class="calc-header">
-      <div><div class="calc-title">📈 Framingham Risk Score</div><div class="calc-source">Nguy cơ bệnh tim mạch vành 10 năm</div></div>
-      <span class="badge b-blue">CVD 10yr</span>
-    </div>
-    <div class="field"><label class="field-label">Nhóm tuổi</label>
-    <div class="radio-wrap" id="fr-age">
-      <div class="rbtn" data-val="-9">30–34</div><div class="rbtn" data-val="-4">35–39</div><div class="rbtn" data-val="0">40–44</div><div class="rbtn" data-val="3">45–49</div><div class="rbtn" data-val="6">50–54</div><div class="rbtn" data-val="8">55–59</div><div class="rbtn" data-val="10">60–64</div><div class="rbtn" data-val="11">65–69</div><div class="rbtn" data-val="12">70–74</div>
-    </div></div>
-    <div class="field"><label class="field-label">LDL-C (mg/dL)</label>
-    <div class="radio-wrap" id="fr-ldl">
-      <div class="rbtn" data-val="-3">&lt;100</div><div class="rbtn" data-val="0">100–129</div><div class="rbtn" data-val="1">130–159</div><div class="rbtn" data-val="2">160–189</div><div class="rbtn" data-val="3">≥190</div>
-    </div></div>
-    <div class="field"><label class="field-label">HA tâm thu (mmHg)</label>
-    <div class="radio-wrap" id="fr-sbp">
-      <div class="rbtn" data-val="-2">&lt;120</div><div class="rbtn" data-val="0">120–129</div><div class="rbtn" data-val="1">130–139</div><div class="rbtn" data-val="2">140–159</div><div class="rbtn" data-val="3">≥160</div>
-    </div></div>
-    <div class="chk-grid" style="margin-top:8px">
-      <label class="chk" onclick="tgl(this)"><input type="checkbox" value="4"><div class="chk-box">✓</div><div class="chk-text">Hút thuốc lá</div><span class="chk-pt">+4</span></label>
-      <label class="chk" onclick="tgl(this)"><input type="checkbox" value="3"><div class="chk-box">✓</div><div class="chk-text">Đái tháo đường type 2</div><span class="chk-pt">+3</span></label>
-      <label class="chk" onclick="tgl(this)"><input type="checkbox" value="1"><div class="chk-box">✓</div><div class="chk-text">THA đang điều trị</div><span class="chk-pt">+1</span></label>
-    </div>
-    <div class="btn-row">
-      <button class="btn btn-primary" onclick="calcFramingham()">⚡ Tính điểm</button>
-      <button class="btn btn-ghost" onclick="resetCalc('framingham')">↺ Đặt lại</button>
-    </div>
-    <div class="result-box" id="res-framingham">
-      <div class="result-score" id="rn-framingham" style="color:var(--blue2)">0</div>
-      <div class="result-label">Framingham Score</div>
-      <div class="risk-strip" id="ri-framingham"></div>
-      <div class="rec-title">Điều trị dự phòng</div>
-      <ul class="rec-list" id="rc-framingham"></ul>
-    </div>
-  </div>
-
-  <!-- NYHA -->
-  <div class="calc card" id="calc-nyha">
-    <div class="calc-header"><div><div class="calc-title">🏃 NYHA / ACC-AHA Phân độ</div><div class="calc-source">Suy tim · Phân độ chức năng</div></div></div>
-    <div style="display:flex;flex-direction:column;gap:8px">
-      <div class="chk" style="cursor:pointer;background:var(--bg3)" onclick="showNYHA(1,this)">
-        <div style="width:26px;height:26px;border-radius:50%;background:rgba(16,185,129,.2);border:2px solid var(--green);display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--green2);font-weight:700;flex-shrink:0">I</div>
-        <div><div class="chk-text" style="font-weight:600">Class I — Không triệu chứng</div><div style="font-size:11px;color:var(--text3);margin-top:2px">Hoạt động bình thường không gây khó chịu</div></div>
-      </div>
-      <div class="chk" style="cursor:pointer;background:var(--bg3)" onclick="showNYHA(2,this)">
-        <div style="width:26px;height:26px;border-radius:50%;background:rgba(245,158,11,.2);border:2px solid var(--yellow);display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--yellow2);font-weight:700;flex-shrink:0">II</div>
-        <div><div class="chk-text" style="font-weight:600">Class II — Giới hạn nhẹ</div><div style="font-size:11px;color:var(--text3);margin-top:2px">Triệu chứng khi gắng sức vừa phải</div></div>
-      </div>
-      <div class="chk" style="cursor:pointer;background:var(--bg3)" onclick="showNYHA(3,this)">
-        <div style="width:26px;height:26px;border-radius:50%;background:rgba(249,115,22,.2);border:2px solid var(--orange);display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--orange2);font-weight:700;flex-shrink:0">III</div>
-        <div><div class="chk-text" style="font-weight:600">Class III — Giới hạn rõ rệt</div><div style="font-size:11px;color:var(--text3);margin-top:2px">Triệu chứng khi gắng sức nhẹ</div></div>
-      </div>
-      <div class="chk" style="cursor:pointer;background:var(--bg3)" onclick="showNYHA(4,this)">
-        <div style="width:26px;height:26px;border-radius:50%;background:rgba(239,68,68,.2);border:2px solid var(--red);display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--red2);font-weight:700;flex-shrink:0">IV</div>
-        <div><div class="chk-text" style="font-weight:600">Class IV — Triệu chứng lúc nghỉ</div><div style="font-size:11px;color:var(--text3);margin-top:2px">Không thể hoạt động, khó chịu cả khi nghỉ</div></div>
-      </div>
-    </div>
-    <div class="result-box" id="res-nyha">
-      <div class="result-score" id="rn-nyha">I</div>
-      <div class="result-label">NYHA Class</div>
-      <div class="risk-strip" id="ri-nyha"></div>
-      <div class="rec-title">Điều trị khuyến cáo</div>
-      <ul class="rec-list" id="rc-nyha"></ul>
-    </div>
-  </div>
-
-  <!-- KILLIP -->
-  <div class="calc card" id="calc-killip">
-    <div class="calc-header"><div><div class="calc-title">🫁 Killip Classification</div><div class="calc-source">Suy tim trong Nhồi máu cơ tim · Tiên lượng tử vong</div></div></div>
-    <div style="display:flex;flex-direction:column;gap:8px">
-      <div class="chk" style="cursor:pointer;background:var(--bg3)" onclick="showKillip(1)">
-        <div style="width:26px;height:26px;border-radius:50%;background:rgba(16,185,129,.2);border:2px solid var(--green);display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--green2);font-weight:700;flex-shrink:0">I</div>
-        <div><div class="chk-text" style="font-weight:600">Class I — Không suy tim</div><div style="font-size:11px;color:var(--text3)">Không ran, không T3 · Tử vong ~6%</div></div>
-      </div>
-      <div class="chk" style="cursor:pointer;background:var(--bg3)" onclick="showKillip(2)">
-        <div style="width:26px;height:26px;border-radius:50%;background:rgba(245,158,11,.2);border:2px solid var(--yellow);display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--yellow2);font-weight:700;flex-shrink:0">II</div>
-        <div><div class="chk-text" style="font-weight:600">Class II — Suy tim nhẹ</div><div style="font-size:11px;color:var(--text3)">Ran &lt;50%, tiếng T3 · Tử vong ~17%</div></div>
-      </div>
-      <div class="chk" style="cursor:pointer;background:var(--bg3)" onclick="showKillip(3)">
-        <div style="width:26px;height:26px;border-radius:50%;background:rgba(249,115,22,.2);border:2px solid var(--orange);display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--orange2);font-weight:700;flex-shrink:0">III</div>
-        <div><div class="chk-text" style="font-weight:600">Class III — Phù phổi cấp</div><div style="font-size:11px;color:var(--text3)">Ran &gt;50% hai phổi · Tử vong ~38%</div></div>
-      </div>
-      <div class="chk" style="cursor:pointer;background:var(--bg3)" onclick="showKillip(4)">
-        <div style="width:26px;height:26px;border-radius:50%;background:rgba(239,68,68,.2);border:2px solid var(--red);display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--red2);font-weight:700;flex-shrink:0">IV</div>
-        <div><div class="chk-text" style="font-weight:600">Class IV — Sốc tim</div><div style="font-size:11px;color:var(--text3)">HA &lt;90, đầu chi lạnh · Tử vong ~81%</div></div>
-      </div>
-    </div>
-    <div class="result-box" id="res-killip">
-      <div class="result-score" id="rn-killip">I</div>
-      <div class="result-label">Killip Class</div>
-      <div class="risk-strip" id="ri-killip"></div>
-    </div>
-  </div>
-
-  <!-- NISSH -->
-  <div class="calc card" id="calc-nissh">
-    <div class="calc-header">
-      <div><div class="calc-title">🩺 NISSH Score</div><div class="calc-source">Đánh giá nội khoa Suy tim · Trung tâm Tim mạch Quốc gia</div></div>
-      <span class="badge b-cyan">Suy tim</span>
-    </div>
-    <div class="info-box" style="margin-bottom:12px">ℹ️ NISSH (National Inpatient Sample Score for Heart failure) đánh giá mức độ nặng của suy tim nhập viện và dự đoán nguy cơ tử vong nội viện.</div>
-    <div class="field"><label class="field-label">EF (Phân suất tống máu)</label>
-    <div class="radio-wrap" id="ns-ef">
-      <div class="rbtn" data-val="0">EF ≥ 50% (HFpEF)</div><div class="rbtn" data-val="1">EF 40–49% (HFmrEF)</div><div class="rbtn" data-val="2">EF &lt; 40% (HFrEF)</div>
-    </div></div>
-    <div class="field"><label class="field-label">Nguyên nhân nhập viện chính</label>
-    <div class="radio-wrap" id="ns-cause">
-      <div class="rbtn" data-val="0">Sung huyết</div><div class="rbtn" data-val="1">Thiếu máu cơ tim</div><div class="rbtn" data-val="1">Loạn nhịp</div><div class="rbtn" data-val="2">Sốc tim</div>
-    </div></div>
-    <div class="chk-grid" style="margin-top:8px">
-      <label class="chk" onclick="tgl(this)"><input type="checkbox" value="2"><div class="chk-box">✓</div><div class="chk-text">Nhập viện lần đầu</div><span class="chk-pt">+2</span></label>
-      <label class="chk" onclick="tgl(this)"><input type="checkbox" value="1"><div class="chk-box">✓</div><div class="chk-text">Tái nhập &lt; 30 ngày</div><span class="chk-pt">+1</span></label>
-      <label class="chk" onclick="tgl(this)"><input type="checkbox" value="1"><div class="chk-box">✓</div><div class="chk-text">BNP &gt; 500 pg/mL</div><span class="chk-pt">+1</span></label>
-      <label class="chk" onclick="tgl(this)"><input type="checkbox" value="1"><div class="chk-box">✓</div><div class="chk-text">Na⁺ &lt; 135 mEq/L</div><span class="chk-pt">+1</span></label>
-      <label class="chk" onclick="tgl(this)"><input type="checkbox" value="1"><div class="chk-box">✓</div><div class="chk-text">Creatinine &gt; 1.5 mg/dL</div><span class="chk-pt">+1</span></label>
-      <label class="chk" onclick="tgl(this)"><input type="checkbox" value="1"><div class="chk-box">✓</div><div class="chk-text">Cần lợi tiểu IV</div><span class="chk-pt">+1</span></label>
-      <label class="chk" onclick="tgl(this)"><input type="checkbox" value="2"><div class="chk-box">✓</div><div class="chk-text">Cần thuốc vận mạch</div><span class="chk-pt">+2</span></label>
-      <label class="chk" onclick="tgl(this)"><input type="checkbox" value="1"><div class="chk-box">✓</div><div class="chk-text">Rung nhĩ kèm theo</div><span class="chk-pt">+1</span></label>
-      <label class="chk" onclick="tgl(this)"><input type="checkbox" value="1"><div class="chk-box">✓</div><div class="chk-text">NYHA III–IV tại nhập viện</div><span class="chk-pt">+1</span></label>
-    </div>
-    <div class="btn-row">
-      <button class="btn btn-primary" onclick="calcNissh()">⚡ Tính điểm</button>
-      <button class="btn btn-ghost" onclick="resetCalc('nissh')">↺ Đặt lại</button>
-    </div>
-    <div class="result-box" id="res-nissh">
-      <div class="result-score" id="rn-nissh" style="color:var(--cyan2)">0</div>
-      <div class="result-label">NISSH Score</div>
-      <div class="nissh-meter">
-        <div style="font-size:12px;color:var(--text2);margin-bottom:6px">Mức độ nặng</div>
-        <div class="meter-track"><div class="meter-fill" id="nissh-bar" style="width:0%"></div></div>
-        <div class="meter-markers"><span>0</span><span>Nhẹ</span><span>Trung bình</span><span>Nặng</span><span>Rất nặng</span></div>
-      </div>
-      <div class="risk-strip" id="ri-nissh"></div>
-      <div class="rec-title">Hướng xử trí</div>
-      <ul class="rec-list" id="rc-nissh"></ul>
-    </div>
-  </div>
-</div>
-</div>
-
-<!-- ═══ DRUGS ═══ -->
-<div id="pg-drugs" class="page">
-<div class="wrap">
-  <div class="page-title">Dược lý Tim mạch</div>
-  <div class="search-wrap">
-    <input class="input" id="drug-search" placeholder="Tìm tên thuốc, nhóm, chỉ định..." oninput="filterDrugs(this.value)">
-    <span class="ico">🔍</span>
-  </div>
-  <div class="filter-bar">
-    <div class="fchip on" onclick="filterClass('all',this)">Tất cả</div>
-    <div class="fchip" onclick="filterClass('anticoag',this)">Kháng đông</div>
-    <div class="fchip" onclick="filterClass('antiplat',this)">Kháng tiểu cầu</div>
-    <div class="fchip" onclick="filterClass('bb',this)">Beta-blocker</div>
-    <div class="fchip" onclick="filterClass('raas',this)">RAAS</div>
-    <div class="fchip" onclick="filterClass('statin',this)">Statin</div>
-    <div class="fchip" onclick="filterClass('diuretic',this)">Lợi tiểu</div>
-    <div class="fchip" onclick="filterClass('antiarr',this)">Loạn nhịp</div>
-    <div class="fchip" onclick="filterClass('nitrate',this)">Nitrate</div>
-    <div class="fchip" onclick="filterClass('ccb',this)">CCB</div>
-  </div>
-  <div id="drug-list"></div>
-</div>
-</div>
-
-<!-- ═══ PROTOCOLS ═══ -->
-<div id="pg-protocols" class="page">
-<div class="wrap">
-  <div class="page-title">Phác đồ Điều trị</div>
-  <div class="proto-tabs">
-    <div class="ptab on" id="pt-hf" onclick="openProto('hf')">Suy tim HFrEF</div>
-    <div class="ptab" id="pt-af" onclick="openProto('af')">Rung nhĩ</div>
-    <div class="ptab" id="pt-stemi" onclick="openProto('stemi')">STEMI</div>
-    <div class="ptab" id="pt-nstemi" onclick="openProto('nstemi')">NSTEMI / UA</div>
-    <div class="ptab" id="pt-htn" onclick="openProto('htn')">Tăng huyết áp</div>
-    <div class="ptab" id="pt-pe" onclick="openProto('pe')">Thuyên tắc phổi</div>
-  </div>
-
-  <div class="proto show" id="proto-hf">
-    <div class="card" style="margin-bottom:10px;background:rgba(16,185,129,.06);border-color:rgba(16,185,129,.25)">
-      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
-        <div><div style="font-weight:700;font-size:15px">💚 Suy tim EF giảm (HFrEF)</div><div style="font-size:11px;color:var(--text3);font-family:var(--mono);margin-top:2px">ESC Heart Failure Guidelines 2021 · EF &lt; 40%</div></div>
-        <span class="badge b-green">4 trụ cột</span>
-      </div>
-    </div>
-    <div class="card">
-      <div style="display:flex;flex-direction:column;gap:0">
-        <div class="step">
-          <div class="step-line"><div class="sdot" style="background:rgba(59,130,246,.15);border:2px solid var(--blue);color:var(--blue2)">1</div><div class="sline"></div></div>
-          <div class="sbody"><div class="s-title">Chẩn đoán & Đánh giá ban đầu</div><div class="s-content"><ul><li>Siêu âm tim: xác định EF, kích thước buồng, van tim</li><li>BNP ≥ 35 hoặc NT-proBNP ≥ 125 pg/mL → chẩn đoán suy tim</li><li>ECG, X-quang ngực, ion đồ, creatinine, HbA1c, TSH</li><li>Tìm nguyên nhân: thiếu máu cơ tim, THA, van tim, loạn nhịp</li></ul></div></div>
-        </div>
-        <div class="step">
-          <div class="step-line"><div class="sdot" style="background:rgba(16,185,129,.15);border:2px solid var(--green);color:var(--green2)">2</div><div class="sline"></div></div>
-          <div class="sbody"><div class="s-title">Tứ trụ điều trị — Class I (bắt buộc)</div><div class="s-content"><ul><li><strong>RAAS:</strong> Ưu tiên <code>Sacubitril/Valsartan (ARNI)</code> nếu dung nạp được; nếu không: ACEI/ARB</li><li><strong>Beta-blocker:</strong> <code>Bisoprolol</code>, <code>Carvedilol</code>, hoặc <code>Metoprolol succinate</code></li><li><strong>MRA:</strong> <code>Spironolactone 25–50 mg</code> hoặc <code>Eplerenone</code></li><li><strong>SGLT2i:</strong> <code>Dapagliflozin 10 mg</code> hoặc <code>Empagliflozin 10 mg</code> — bất kể có ĐTĐ</li></ul></div></div>
-        </div>
-        <div class="step">
-          <div class="step-line"><div class="sdot" style="background:rgba(245,158,11,.15);border:2px solid var(--yellow);color:var(--yellow2)">3</div><div class="sline"></div></div>
-          <div class="sbody"><div class="s-title">Điều trị triệu chứng sung huyết</div><div class="s-content"><ul><li>Lợi tiểu quai: <code>Furosemide 20–80 mg/ngày</code>, chỉnh liều theo triệu chứng & cân nặng</li><li>Mục tiêu: hết phù, hết khó thở, cân nặng ổn định</li><li>Hạn chế muối &lt; 2g/ngày; hạn chế nước nếu Na⁺ &lt; 130</li><li>Theo dõi điện giải, creatinine 1–2 tuần sau thay đổi liều</li></ul></div></div>
-        </div>
-        <div class="step">
-          <div class="step-line"><div class="sdot" style="background:rgba(239,68,68,.15);border:2px solid var(--red);color:var(--red2)">4</div><div class="sline"></div></div>
-          <div class="sbody"><div class="s-title">Thiết bị & Can thiệp</div><div class="s-content"><ul><li><strong>ICD:</strong> EF ≤ 35% sau ≥3 tháng điều trị tối ưu, NYHA II–III, kỳ vọng &gt;1 năm</li><li><strong>CRT:</strong> EF ≤ 35%, QRS ≥ 150ms (LBBB), NYHA II–IV</li><li><strong>Tái tưới máu:</strong> Thiếu máu cơ tim có thể hồi phục</li><li><strong>Ghép tim / LVAD:</strong> Giai đoạn cuối, trơ điều trị nội khoa</li></ul></div></div>
-        </div>
-        <div class="step">
-          <div class="step-line"><div class="sdot" style="background:rgba(139,92,246,.15);border:2px solid var(--purple);color:var(--purple2)">5</div></div>
-          <div class="sbody"><div class="s-title">Theo dõi & Đích điều trị</div><div class="s-content"><ul><li>Tái khám 1–2 tuần sau xuất viện, sau đó 3–6 tháng</li><li>Đích nhịp tim: 50–60 lần/phút; HA: 100–130/70–80 mmHg</li><li>Tái đánh giá EF sau 3–6 tháng điều trị tối ưu</li><li>Theo dõi cân nặng hàng ngày, báo ngay nếu tăng &gt;2 kg/2 ngày</li></ul></div></div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="proto" id="proto-af">
-    <div class="card" style="margin-bottom:10px;background:rgba(59,130,246,.06);border-color:rgba(59,130,246,.25)">
-      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
-        <div><div style="font-weight:700;font-size:15px">🔵 Rung nhĩ (Atrial Fibrillation)</div><div style="font-size:11px;color:var(--text3);font-family:var(--mono);margin-top:2px">ESC AF Guidelines 2023 · Chiến lược ABC</div></div>
-        <span class="badge b-blue">ESC 2023</span>
-      </div>
-    </div>
-    <div class="card">
-      <div style="display:flex;flex-direction:column;gap:0">
-        <div class="step">
-          <div class="step-line"><div class="sdot" style="background:rgba(59,130,246,.15);border:2px solid var(--blue);color:var(--blue2)">A</div><div class="sline"></div></div>
-          <div class="sbody"><div class="s-title">A — Anticoagulation (Dự phòng thuyên tắc)</div><div class="s-content"><ul><li>Tính <strong>CHA₂DS₂-VASc</strong>: kháng đông nếu ≥2 (nam) hoặc ≥3 (nữ)</li><li>Ưu tiên <strong>NOAC</strong>: <code>Apixaban</code>, <code>Rivaroxaban</code>, <code>Dabigatran</code>, <code>Edoxaban</code></li><li>Warfarin chỉ khi: van tim cơ học, hẹp van 2 lá nặng → INR 2–3</li><li>Tính <strong>HAS-BLED ≥3</strong> → nguy cơ cao → sửa YTNC, KHÔNG chống chỉ định kháng đông</li></ul></div></div>
-        </div>
-        <div class="step">
-          <div class="step-line"><div class="sdot" style="background:rgba(245,158,11,.15);border:2px solid var(--yellow);color:var(--yellow2)">B</div><div class="sline"></div></div>
-          <div class="sbody"><div class="s-title">B — Better Symptom Management</div><div class="s-content"><ul><li><strong>Kiểm soát tần số:</strong> Nhịp thất đích 80–110 l/phút nghỉ ngơi<br>→ <code>Bisoprolol</code>, <code>Metoprolol</code>, <code>Diltiazem/Verapamil</code> (không dùng nếu HFrEF)</li><li><strong>Kiểm soát nhịp:</strong> Ưu tiên nếu mới phát, triệu chứng nặng, HFrEF<br>→ <code>Amiodarone</code> (bệnh tim thực thể/HF)<br>→ <code>Flecainide/Propafenone</code> (không bệnh tim)</li><li><strong>Triệt đốt (Ablation):</strong> Rung nhĩ kịch phát/dai dẳng trơ với thuốc</li></ul></div></div>
-        </div>
-        <div class="step">
-          <div class="step-line"><div class="sdot" style="background:rgba(16,185,129,.15);border:2px solid var(--green);color:var(--green2)">C</div></div>
-          <div class="sbody"><div class="s-title">C — Cardiovascular Risk & Comorbidities</div><div class="s-content"><ul><li>Kiểm soát THA &lt; 130/80 mmHg; điều trị suy tim tối ưu</li><li>Giảm cân nếu BMI &gt; 27; hạn chế rượu bia</li><li>Điều trị hội chứng ngưng thở khi ngủ (OSA)</li><li>Kiểm soát ĐTĐ, rối loạn lipid máu</li></ul></div></div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="proto" id="proto-stemi">
-    <div class="card" style="margin-bottom:10px;background:rgba(239,68,68,.06);border-color:rgba(239,68,68,.25)">
-      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
-        <div><div style="font-weight:700;font-size:15px">🔴 STEMI — Nhồi máu cơ tim cấp</div><div style="font-size:11px;color:var(--text3);font-family:var(--mono);margin-top:2px">ACC/AHA 2022 · Door-to-Balloon ≤ 90 phút</div></div>
-        <span class="badge b-red">Khẩn cấp</span>
-      </div>
-    </div>
-    <div class="card">
-      <div style="display:flex;flex-direction:column;gap:0">
-        <div class="step"><div class="step-line"><div class="sdot" style="background:rgba(239,68,68,.15);border:2px solid var(--red);color:var(--red2)">1</div><div class="sline"></div></div>
-          <div class="sbody"><div class="s-title">Tiếp nhận & Xử trí ban đầu (0–10 phút)</div><div class="s-content"><ul><li>ECG 12 chuyển đạo trong vòng <strong>10 phút</strong></li><li><code>Aspirin 300 mg</code> nhai ngay (nếu chưa dùng)</li><li>P2Y12i: <code>Ticagrelor 180 mg tải</code> hoặc <code>Prasugrel 60 mg tải</code></li><li>Thở O₂ nếu SpO₂ &lt;90%; Morphine IV nếu đau nặng</li><li><strong>Kích hoạt Cath Lab ngay lập tức</strong></li></ul></div></div>
-        </div>
-        <div class="step"><div class="step-line"><div class="sdot" style="background:rgba(239,68,68,.15);border:2px solid var(--red);color:var(--red2)">2</div><div class="sline"></div></div>
-          <div class="sbody"><div class="s-title">Chiến lược tái tưới máu</div><div class="s-content"><ul><li><strong>Primary PCI (ưu tiên):</strong> Door-to-balloon ≤ 90 phút</li><li><strong>Tiêu sợi huyết:</strong> Khi không PCI được trong 120 phút<br>→ <code>Tenecteplase</code> (cân theo cân nặng), <code>Alteplase 100mg/2h</code><br>→ Chuyển PCI sau 2–24 giờ (pharmacoinvasive strategy)</li><li>Heparin trong can thiệp: <code>UFH 60–100 UI/kg IV</code></li></ul></div></div>
-        </div>
-        <div class="step"><div class="step-line"><div class="sdot" style="background:rgba(59,130,246,.15);border:2px solid var(--blue);color:var(--blue2)">3</div><div class="sline"></div></div>
-          <div class="sbody"><div class="s-title">Điều trị sau tái tưới máu</div><div class="s-content"><ul><li>DAPT 12 tháng: <code>Aspirin 81–100mg</code> + <code>Ticagrelor 90mg×2</code></li><li>Statin liều cao: <code>Atorvastatin 40–80mg</code> — bắt đầu ngay</li><li>Beta-blocker: <code>Bisoprolol/Metoprolol</code> trong 24h nếu ổn định</li><li>ACEI/ARB: trong 24h, đặc biệt EF giảm, STEMI trước, ĐTĐ</li><li>Kháng aldosterone: EF ≤40% + HF hoặc ĐTĐ</li></ul></div></div>
-        </div>
-        <div class="step"><div class="step-line"><div class="sdot" style="background:rgba(16,185,129,.15);border:2px solid var(--green);color:var(--green2)">4</div></div>
-          <div class="sbody"><div class="s-title">Xuất viện & Phục hồi</div><div class="s-content"><ul><li>Siêu âm tim trước xuất viện hoặc ngày 40</li><li>Chương trình phục hồi tim mạch có giám sát</li><li>Tư vấn: cai thuốc, chế độ ăn, vận động, kiểm soát YTNC</li><li>Tái khám 1–2 tuần sau xuất viện</li></ul></div></div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="proto" id="proto-nstemi">
-    <div class="card" style="margin-bottom:10px;background:rgba(249,115,22,.06);border-color:rgba(249,115,22,.25)">
-      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
-        <div><div style="font-weight:700;font-size:15px">🟠 NSTEMI / Đau thắt ngực không ổn định</div><div style="font-size:11px;color:var(--text3);font-family:var(--mono);margin-top:2px">ESC 2023 · Phân tầng nguy cơ GRACE</div></div>
-        <span class="badge b-orange">NSTEMI</span>
-      </div>
-    </div>
-    <div class="card">
-      <div style="display:flex;flex-direction:column;gap:0">
-        <div class="step"><div class="step-line"><div class="sdot" style="background:rgba(245,158,11,.15);border:2px solid var(--yellow);color:var(--yellow2)">1</div><div class="sline"></div></div>
-          <div class="sbody"><div class="s-title">Phân tầng nguy cơ & Điều trị ban đầu</div><div class="s-content"><ul><li>Tính <strong>GRACE Score</strong> → quyết định chiến lược xâm nhập</li><li>Aspirin tải <code>300 mg</code>, sau đó <code>75–100mg/ngày</code></li><li>Heparin: <code>Enoxaparin 1mg/kg × 2/ngày</code> hoặc UFH</li><li>Nitrate IV/dưới lưỡi, Beta-blocker nếu không chống chỉ định</li></ul></div></div>
-        </div>
-        <div class="step"><div class="step-line"><div class="sdot" style="background:rgba(249,115,22,.15);border:2px solid var(--orange);color:var(--orange2)">2</div><div class="sline"></div></div>
-          <div class="sbody"><div class="s-title">Chiến lược tái tưới máu theo GRACE</div><div class="s-content"><ul><li><strong>GRACE &gt;140 / huyết động không ổn:</strong> PCI ngay &lt; 2 giờ</li><li><strong>GRACE &gt;109 / men tim tăng / ST thay đổi:</strong> PCI sớm &lt; 24 giờ</li><li><strong>Nguy cơ trung bình:</strong> PCI trong 72 giờ</li><li><strong>Nguy cơ thấp:</strong> Điều trị bảo tồn, test gắng sức trước xuất viện</li></ul></div></div>
-        </div>
-        <div class="step"><div class="step-line"><div class="sdot" style="background:rgba(59,130,246,.15);border:2px solid var(--blue);color:var(--blue2)">3</div></div>
-          <div class="sbody"><div class="s-title">Thuốc dài hạn</div><div class="s-content"><ul><li>DAPT 12 tháng (rút ngắn 3–6 tháng nếu nguy cơ chảy máu cao)</li><li>Statin liều cao, ACEI/ARB, Beta-blocker</li><li>Không dùng NSAIDs, COX-2 dài hạn</li></ul></div></div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="proto" id="proto-htn">
-    <div class="card" style="margin-bottom:10px;background:rgba(139,92,246,.06);border-color:rgba(139,92,246,.25)">
-      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
-        <div><div style="font-weight:700;font-size:15px">🩺 Tăng huyết áp</div><div style="font-size:11px;color:var(--text3);font-family:var(--mono);margin-top:2px">ESC/ESH 2023 · Mục tiêu &lt;130/80 mmHg</div></div>
-        <span class="badge b-purple">HTN</span>
-      </div>
-    </div>
-    <div class="card">
-      <div style="display:flex;flex-direction:column;gap:0">
-        <div class="step"><div class="step-line"><div class="sdot" style="background:rgba(59,130,246,.15);border:2px solid var(--blue);color:var(--blue2)">1</div><div class="sline"></div></div>
-          <div class="sbody"><div class="s-title">Phân loại & Chẩn đoán</div><div class="s-content"><ul><li><strong>Bình thường cao:</strong> 130–139/85–89 → Thay đổi lối sống</li><li><strong>Độ 1:</strong> 140–159/90–99 → Lối sống ± thuốc (nếu nguy cơ cao)</li><li><strong>Độ 2:</strong> 160–179/100–109 → Phối hợp thuốc ngay + lối sống</li><li><strong>Độ 3:</strong> ≥ 180/110 → Phối hợp 2–3 thuốc ngay</li><li>Đánh giá tổn thương cơ quan đích: tim, thận, mắt, não</li></ul></div></div>
-        </div>
-        <div class="step"><div class="step-line"><div class="sdot" style="background:rgba(16,185,129,.15);border:2px solid var(--green);color:var(--green2)">2</div><div class="sline"></div></div>
-          <div class="sbody"><div class="s-title">Khởi đầu điều trị thuốc</div><div class="s-content"><ul><li><strong>Nhóm ưu tiên:</strong> ACEI/ARB, CCB dihydropyridine, Thiazide/TLD</li><li><strong>Phối hợp đầu:</strong> ACEI/ARB + CCB → cân nhắc viên kết hợp</li><li>Thêm Thiazide nếu chưa đạt mục tiêu</li><li><strong>Bậc 4 (kháng trị):</strong> Thêm Spironolactone 25–50 mg</li><li>Beta-blocker khi có chỉ định đặc biệt: HF, RN, sau NMCT</li></ul></div></div>
-        </div>
-        <div class="step"><div class="step-line"><div class="sdot" style="background:rgba(245,158,11,.15);border:2px solid var(--yellow);color:var(--yellow2)">3</div></div>
-          <div class="sbody"><div class="s-title">Đích HA & Chỉnh liều</div><div class="s-content"><ul><li>Mục tiêu chung: &lt; 130/80 mmHg</li><li>Người cao tuổi ≥65: 130–139 / 70–79 (cẩn thận tụt HA tư thế)</li><li>Bệnh thận mạn: &lt; 130/80 (theo dõi Cr sát nếu eGFR thấp)</li><li>Tái khám 1–3 tháng đầu, sau đó 3–6 tháng</li></ul></div></div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="proto" id="proto-pe">
-    <div class="card" style="margin-bottom:10px;background:rgba(139,92,246,.06);border-color:rgba(139,92,246,.25)">
-      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
-        <div><div style="font-weight:700;font-size:15px">🫁 Thuyên tắc phổi (PE / VTE)</div><div style="font-size:11px;color:var(--text3);font-family:var(--mono);margin-top:2px">ESC 2019 · Phân tầng & Điều trị</div></div>
-        <span class="badge b-purple">PE/VTE</span>
-      </div>
-    </div>
-    <div class="card">
-      <div style="display:flex;flex-direction:column;gap:0">
-        <div class="step"><div class="step-line"><div class="sdot" style="background:rgba(139,92,246,.15);border:2px solid var(--purple);color:var(--purple2)">1</div><div class="sline"></div></div>
-          <div class="sbody"><div class="s-title">Chẩn đoán & Phân tầng</div><div class="s-content"><ul><li>Tính <strong>Wells Score</strong> → phân loại xác suất lâm sàng</li><li>D-dimer: âm tính (nguy cơ thấp) → loại trừ PE</li><li>CTPA: tiêu chuẩn vàng chẩn đoán</li><li>Siêu âm tim: giãn RV, tăng áp phổi trong PE nặng</li></ul></div></div>
-        </div>
-        <div class="step"><div class="step-line"><div class="sdot" style="background:rgba(239,68,68,.15);border:2px solid var(--red);color:var(--red2)">2</div><div class="sline"></div></div>
-          <div class="sbody"><div class="s-title">Điều trị theo mức độ</div><div class="s-content"><ul><li><strong>PE nguy cơ cao (sốc/tụt HA):</strong> Tiêu sợi huyết hệ thống<br>→ <code>Alteplase 100mg / 2 giờ</code> → Heparin sau đó</li><li><strong>PE trung bình-cao:</strong> Kháng đông đầy đủ, theo dõi sát, cân nhắc tiêu sợi huyết cứu vãn</li><li><strong>PE nguy cơ thấp:</strong> NOAC sớm, xem xét xuất viện sớm (PESI thấp)</li><li>Kháng đông ban đầu: <code>Enoxaparin</code>, <code>Fondaparinux</code>, <code>UFH</code></li></ul></div></div>
-        </div>
-        <div class="step"><div class="step-line"><div class="sdot" style="background:rgba(59,130,246,.15);border:2px solid var(--blue);color:var(--blue2)">3</div></div>
-          <div class="sbody"><div class="s-title">Dài hạn & Phòng tái phát</div><div class="s-content"><ul><li>NOAC ≥ 3 tháng: <code>Rivaroxaban</code>, <code>Apixaban</code>, <code>Edoxaban</code></li><li>PE tự phát lần 1: kháng đông 3–6 tháng → tái đánh giá</li><li>PE tái phát / YTNC dai dẳng: kháng đông vô thời hạn</li><li>Ung thư: LMWH hoặc NOAC (Rivaroxaban/Apixaban) dài hạn</li><li>Tái khám 3–6 tháng: sàng lọc CTEPH (tăng áp phổi mạn)</li></ul></div></div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-</div>
-</div>
-
-<!-- ═══ PATIENTS ═══ -->
-<div id="pg-patients" class="page">
-<div class="wrap">
-  <div class="page-title">Theo dõi Bệnh nhân</div>
-
-  <div class="pat-stats">
-    <div class="pstat"><div class="pstat-num" style="color:var(--blue2)" id="pt-total">0</div><div class="pstat-lbl">Tổng số</div></div>
-    <div class="pstat"><div class="pstat-num" style="color:var(--red2)" id="pt-highrisk">0</div><div class="pstat-lbl">Nguy cơ cao</div></div>
-    <div class="pstat"><div class="pstat-num" style="color:var(--green2)" id="pt-recent">0</div><div class="pstat-lbl">Hôm nay</div></div>
-  </div>
-
-  <div class="btn-row" style="margin-bottom:14px">
-    <button class="btn btn-primary" onclick="showAddPatient()">+ Thêm bệnh nhân</button>
-    <button class="btn btn-ghost" onclick="loadPatients()">↺ Làm mới</button>
-  </div>
-
-  <!-- Add Patient Form -->
-  <div class="pat-form" id="add-pat-form" style="display:none">
-    <div style="font-weight:700;font-size:14px;margin-bottom:14px">➕ Thêm bệnh nhân mới</div>
-    <div class="form-grid">
-      <div class="field"><label class="field-label">Họ và tên *</label><input class="input input-sm" id="pf-name" placeholder="Nguyễn Văn A"></div>
-      <div class="field"><label class="field-label">Tuổi</label><input class="input input-sm" id="pf-age" type="number" placeholder="60"></div>
-      <div class="field"><label class="field-label">Giới tính</label><select class="input input-sm" id="pf-sex"><option value="Nam">Nam</option><option value="Nữ">Nữ</option></select></div>
-      <div class="field"><label class="field-label">Mã bệnh nhân</label><input class="input input-sm" id="pf-id" placeholder="BN001"></div>
-    </div>
-    <div class="field"><label class="field-label">Chẩn đoán chính</label>
-    <div class="radio-wrap" id="pf-dx">
-      <div class="rbtn" data-val="Suy tim HFrEF">Suy tim HFrEF</div>
-      <div class="rbtn" data-val="Suy tim HFpEF">Suy tim HFpEF</div>
-      <div class="rbtn" data-val="Rung nhĩ">Rung nhĩ</div>
-      <div class="rbtn" data-val="STEMI">STEMI</div>
-      <div class="rbtn" data-val="NSTEMI">NSTEMI/UA</div>
-      <div class="rbtn" data-val="THA">THA</div>
-      <div class="rbtn" data-val="PE/DVT">PE/DVT</div>
-    </div></div>
-    <div class="field"><label class="field-label">Ghi chú lâm sàng</label><textarea class="note-area" id="pf-note" placeholder="Lâm sàng, kết quả XN, kế hoạch điều trị..."></textarea></div>
-    <div class="btn-row">
-      <button class="btn btn-primary" onclick="savePatient()">💾 Lưu bệnh nhân</button>
-      <button class="btn btn-ghost" onclick="hideAddPatient()">Hủy</button>
-    </div>
-  </div>
-
-  <!-- Patient Detail View -->
-  <div class="pat-detail" id="pat-detail">
-    <div class="pd-header">
-      <div><div class="pd-name" id="pd-name"></div><div class="pd-info" id="pd-info"></div></div>
-      <div style="display:flex;gap:8px">
-        <button class="btn btn-danger" style="font-size:12px;padding:6px 10px" onclick="deletePatient()">🗑</button>
-        <button class="btn btn-ghost" style="font-size:12px;padding:6px 10px" onclick="closePDetail()">✕</button>
-      </div>
-    </div>
-    <div class="pd-section">
-      <div class="pd-sec-title">Điểm tim mạch đã tính</div>
-      <div class="pd-score-grid" id="pd-scores"></div>
-    </div>
-    <div class="pd-section">
-      <div class="pd-sec-title">Ghi chú lâm sàng</div>
-      <textarea class="note-area" id="pd-note" placeholder="Thêm ghi chú..." onchange="updatePatientNote(this.value)"></textarea>
-      <div class="btn-row"><button class="btn btn-success" onclick="savePatientNote()">💾 Lưu ghi chú</button></div>
-    </div>
-  </div>
-
-  <!-- Patient List -->
-  <div id="patient-list">
-    <div class="empty" id="pat-empty">
-      <div class="empty-ico">👤</div>
-      <div class="empty-txt">Chưa có bệnh nhân nào</div>
-      <div class="empty-sub">Nhấn "Thêm bệnh nhân" để bắt đầu theo dõi</div>
-    </div>
-  </div>
-</div>
-</div>
-
-</div><!-- /main -->
-
-<!-- BOTTOM NAV -->
-<div class="bnav">
-  <button class="bnav-item active" id="bn-home" onclick="goPage('home')"><div class="bnav-icon">🏠</div><div class="bnav-label">Tổng quan</div></button>
-  <button class="bnav-item" id="bn-scores" onclick="goPage('scores')"><div class="bnav-icon">📊</div><div class="bnav-label">Bảng điểm</div></button>
-  <button class="bnav-item" id="bn-drugs" onclick="goPage('drugs')"><div class="bnav-icon">💊</div><div class="bnav-label">Thuốc</div></button>
-  <button class="bnav-item" id="bn-protocols" onclick="goPage('protocols')"><div class="bnav-icon">📋</div><div class="bnav-label">Phác đồ</div></button>
-  <button class="bnav-item" id="bn-patients" onclick="goPage('patients')"><div class="bnav-icon">👥</div><div class="bnav-label">Bệnh nhân</div></button>
-</div>
-
-<!-- TOAST -->
-<div class="toast" id="toast"></div>
-
-<!-- MODAL -->
-<div class="modal-overlay" id="modal"><div class="modal" id="modal-body"></div></div>
-
-<script>
-// ══════════════════════════════════════════════
-// NAVIGATION
-// ══════════════════════════════════════════════
-function goPage(id) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.bnav-item').forEach(b => b.classList.remove('active'));
-  document.getElementById('pg-' + id).classList.add('active');
-  document.getElementById('bn-' + id).classList.add('active');
-  window.scrollTo({top:0,behavior:'smooth'});
-}
-
-// ══════════════════════════════════════════════
-// SCORE SELECTORS
-// ══════════════════════════════════════════════
-function openCalc(id) {
-  document.querySelectorAll('.calc').forEach(c => c.classList.remove('show'));
-  document.querySelectorAll('.sc').forEach(s => s.classList.remove('on'));
-  const el = document.getElementById('calc-' + id);
-  const sc = document.getElementById('sc-' + id);
-  if(el){el.classList.add('show');setTimeout(()=>el.scrollIntoView({behavior:'smooth',block:'start'}),50)}
-  if(sc) sc.classList.add('on');
-}
-
-// CHECKBOX TOGGLE
-function tgl(el) {
-  el.classList.toggle('on');
-  el.querySelector('input').checked = el.classList.contains('on');
-}
-
-// RADIO BUTTONS
-document.addEventListener('click', e => {
-  if(e.target.classList.contains('rbtn')) {
-    const wrap = e.target.closest('.radio-wrap');
-    if(wrap) wrap.querySelectorAll('.rbtn').forEach(b => b.classList.remove('on'));
-    e.target.classList.add('on');
-  }
-});
-
-function radioVal(id) {
-  const el = document.querySelector('#' + id + ' .rbtn.on');
-  return el ? parseFloat(el.dataset.val || 0) : 0;
-}
-
-function radioTxt(id) {
-  const el = document.querySelector('#' + id + ' .rbtn.on');
-  return el ? (el.dataset.val || '') : '';
-}
-
-function chkSum(sel) {
-  let s = 0;
-  document.querySelectorAll(sel + ' .chk.on input').forEach(i => s += parseFloat(i.value));
-  return s;
-}
-
-// RESET
-function resetCalc(id) {
-  const el = document.getElementById('calc-' + id);
-  el.querySelectorAll('.chk').forEach(c => { c.classList.remove('on'); if(c.querySelector('input')) c.querySelector('input').checked=false; });
-  el.querySelectorAll('.rbtn').forEach(b => b.classList.remove('on'));
-  const res = document.getElementById('res-' + id);
-  if(res) res.classList.remove('show');
-}
-
-// ══════════════════════════════════════════════
-// SCORE CALCULATORS
-// ══════════════════════════════════════════════
-function setResult(id, score, color, riskCls, riskTxt, recs) {
-  document.getElementById('rn-' + id).textContent = score;
-  if(color) document.getElementById('rn-' + id).style.color = color;
-  const ri = document.getElementById('ri-' + id);
-  if(ri) { ri.className = 'risk-strip ' + riskCls; ri.innerHTML = riskTxt; }
-  const rc = document.getElementById('rc-' + id);
-  if(rc) rc.innerHTML = recs.map(r => `<li>${r}</li>`).join('');
-  document.getElementById('res-' + id).classList.add('show');
-}
-
-// CHA2DS2-VASc
-function calcChads() {
-  const s = chkSum('#calc-chads');
-  const rates = [0,1.3,2.2,3.2,4.0,6.7,9.8,9.6,6.7,15.2];
-  const r = rates[Math.min(s,9)];
-  let cls, txt, recs;
-  if(s===0){cls='r-low';txt=`Nguy cơ rất thấp · Tỷ lệ đột quỵ ~${r}%/năm`;recs=['Không cần kháng đông thường quy','Tái đánh giá hàng năm']}
-  else if(s===1){cls='r-low';txt=`Nguy cơ thấp · ~${r}%/năm`;recs=['Nam: cân nhắc NOAC (Class IIa ESC 2023)','Nữ: điểm 1 do giới tính → không kháng đông đơn thuần']}
-  else if(s<=3){cls='r-mod';txt=`Nguy cơ trung bình · ~${r}%/năm → Cần kháng đông`;recs=['Chỉ định kháng đông (Class I)','Ưu tiên NOAC hơn Warfarin','Tính HAS-BLED trước kê toa','Không chống chỉ định kháng đông chỉ vì HAS-BLED cao']}
-  else{cls='r-high';txt=`Nguy cơ cao · ~${r}%/năm → Bắt buộc kháng đông`;recs=['Kháng đông bắt buộc (Class I)','Ưu tiên NOAC: Apixaban/Rivaroxaban/Dabigatran','Nếu van tim cơ học/hẹp 2 lá: Warfarin (INR 2–3)','Theo dõi chức năng thận, điện giải định kỳ']}
-  setResult('chads', s, 'var(--blue2)', cls, txt, recs);
-  storePendingScore('CHA₂DS₂-VASc', s, cls.replace('r-',''));
-}
-
-// HAS-BLED
-function calcHasbled() {
-  const s = chkSum('#calc-hasbled');
-  let cls, txt, recs;
-  if(s<=1){cls='r-low';txt='Nguy cơ chảy máu thấp · Tiến hành kháng đông';recs=['Tiến hành kháng đông theo chỉ định','Theo dõi thường quy hàng năm']}
-  else if(s===2){cls='r-mod';txt='Nguy cơ chảy máu trung bình · Theo dõi chặt hơn';recs=['Tiếp tục kháng đông nếu lợi ích > nguy cơ','Kiểm tra 6 tháng/lần','Kiểm soát THA, INR, ngưng NSAIDs']}
-  else{cls='r-high';txt=`HAS-BLED ${s} ≥ 3 — Nguy cơ cao. KHÔNG phải chống chỉ định kháng đông!`;recs=['KHÔNG ngưng kháng đông chỉ vì HAS-BLED cao','Sửa YTNC có thể thay đổi: THA, INR, NSAIDs, rượu','Theo dõi sát 3 tháng/lần','Cân nhắc NOAC thay Warfarin (ít chảy máu nội sọ hơn)','Đánh giá lại sau khi sửa YTNC']}
-  setResult('hasbled', s, 'var(--red2)', cls, txt, recs);
-  storePendingScore('HAS-BLED', s, cls.replace('r-',''));
-}
-
-// GRACE
-function calcGrace() {
-  const s = Math.round(radioVal('gr-age') + radioVal('gr-sbp') + radioVal('gr-hr') + radioVal('gr-cr') + chkSum('#calc-grace'));
-  let cls, txt, recs;
-  if(s<=108){cls='r-low';txt=`GRACE ${s} — Nguy cơ thấp · Tử vong nội viện <1%, 6 tháng <3%`;recs=['Chiến lược xâm nhập chọn lọc','PCI trong 72 giờ','Xem xét xuất viện sớm']}
-  else if(s<=140){cls='r-mod';txt=`GRACE ${s} — Nguy cơ trung bình · TV nội viện 1–3%, 6 tháng 3–8%`;recs=['Chiến lược xâm nhập sớm trong 24 giờ','Chụp mạch vành sớm','Kháng đông đầy đủ, DAPT']}
-  else{cls='r-high';txt=`GRACE ${s} — Nguy cơ cao · TV nội viện >3%, 6 tháng >8%`;recs=['Xâm nhập rất sớm <2h nếu huyết động không ổn','Chụp mạch trong 24h nếu ổn định huyết động','Cân nhắc IABP, hỗ trợ tuần hoàn cơ học','ICU theo dõi liên tục']}
-  setResult('grace', s, 'var(--orange2)', cls, txt, recs);
-  storePendingScore('GRACE', s, cls.replace('r-',''));
-}
-
-// TIMI STEMI
-function calcTimi() {
-  const s = chkSum('#calc-timi');
-  const morts = [0.8,1.6,2.2,4.4,7.3,12.4,16.1,23.4,26.8,35.9];
-  const m = morts[Math.min(s,9)];
-  let cls;
-  if(s<=3) cls='r-low'; else if(s<=5) cls='r-mod'; else if(s<=7) cls='r-high'; else cls='r-vhigh';
-  setResult('timi', s, 'var(--red2)', cls, `TIMI ${s} — Tử vong 30 ngày ước tính ~${m}%`, []);
-  storePendingScore('TIMI', s, cls.replace('r-',''));
-}
-
-// WELLS PE
-function calcWells() {
-  const s = chkSum('#calc-wells');
-  let cls, txt, recs;
-  if(s<=1){cls='r-low';txt=`Wells ${s.toFixed(1)} — Xác suất PE thấp ~1.3%`;recs=['D-dimer → âm tính: loại trừ PE','D-dimer dương tính → CTPA']}
-  else if(s<=6){cls='r-mod';txt=`Wells ${s.toFixed(1)} — Xác suất PE trung bình ~16–28%`;recs=['Cân nhắc D-dimer độ nhạy cao','Thường chỉ định CTPA trực tiếp','Kháng đông chờ kết quả nếu nguy cơ chảy máu thấp']}
-  else{cls='r-high';txt=`Wells ${s.toFixed(1)} — Xác suất PE cao ~41–68%`;recs=['CTPA ngay lập tức','Không chờ D-dimer','Bắt đầu kháng đông ngay (không CCĐ)','Đánh giá huyết động, phân tầng nguy cơ ngay']}
-  setResult('wells', s.toFixed(1), 'var(--purple2)', cls, txt, recs);
-  storePendingScore('Wells PE', s, cls.replace('r-',''));
-}
-
-// FRAMINGHAM
-function calcFramingham() {
-  const s = radioVal('fr-age') + radioVal('fr-ldl') + radioVal('fr-sbp') + chkSum('#calc-framingham');
-  let risk, cls, recs;
-  if(s<=4){risk='<5%';cls='r-low';recs=['Tư vấn lối sống','Kiểm tra lại 5 năm']}
-  else if(s<=6){risk='5–7.5%';cls='r-low';recs=['Thay đổi lối sống tích cực','Statin ngưỡng thấp nếu LDL cao']}
-  else if(s<=9){risk='7.5–10%';cls='r-mod';recs=['Cân nhắc Statin (AHA Class IIa ≥7.5%)','Kiểm soát THA, ĐTĐ','Cai thuốc lá bắt buộc']}
-  else if(s<=12){risk='10–20%';cls='r-mod';recs=['Statin chỉ định (Class I ≥10%)','Atorvastatin 10–20mg','Aspirin 81mg nếu không nguy cơ chảy máu cao']}
-  else{risk='>20%';cls='r-high';recs=['Statin liều cao: Atorvastatin 40–80mg','Mục tiêu LDL < 55 mg/dL','Kiểm soát toàn diện YTNC','Tái khám 3 tháng']}
-  setResult('framingham', s, 'var(--blue2)', cls, `Nguy cơ CVD 10 năm ước tính: ${risk}`, recs);
-  storePendingScore('Framingham', s, cls.replace('r-',''));
-}
-
-// NYHA
-function showNYHA(n) {
-  const d = {
-    1:{c:'var(--green2)',cls:'r-low',t:'Class I — Không triệu chứng khi hoạt động bình thường',r:['Điều trị nguyên nhân suy tim','Beta-blocker + ACEI/ARB/ARNI nếu EF giảm','SGLT2i bất kể EF','Tái đánh giá siêu âm tim sau 3–6 tháng']},
-    2:{c:'var(--yellow2)',cls:'r-mod',t:'Class II — Triệu chứng nhẹ khi gắng sức vừa phải',r:['Điều trị tứ trụ đầy đủ (RAAS + BB + MRA + SGLT2i)','Lợi tiểu quai khi có sung huyết','Đánh giá ICD nếu EF ≤35%','Phục hồi tim mạch có giám sát']},
-    3:{c:'var(--orange2)',cls:'r-high',t:'Class III — Giảm rõ rệt, triệu chứng với gắng sức nhẹ',r:['Điều trị nội khoa tối ưu đầy đủ','Cân nhắc ICD / CRT','Theo dõi cân nặng hàng ngày','Hội chẩn tim mạch can thiệp / ghép tim']},
-    4:{c:'var(--red2)',cls:'r-vhigh',t:'Class IV — Triệu chứng cả khi nghỉ, mọi hoạt động đều khó',r:['Nhập viện, lợi tiểu IV, vận mạch nếu cần','Đánh giá ghép tim hoặc LVAD','Hỗ trợ tuần hoàn cơ học','Tư vấn chăm sóc giảm nhẹ nếu giai đoạn cuối']},
-  };
-  const x = d[n];
-  document.getElementById('rn-nyha').textContent = ['I','II','III','IV'][n-1];
-  document.getElementById('rn-nyha').style.color = x.c;
-  setResult('nyha', ['I','II','III','IV'][n-1], null, x.cls, x.t, x.r);
-  storePendingScore('NYHA', ['I','II','III','IV'][n-1], x.cls.replace('r-',''));
-}
-
-// KILLIP
-function showKillip(n) {
-  const d = {
-    1:{c:'var(--green2)',cls:'r-low',t:'Killip I — Không suy tim · Tử vong nội viện ~6%'},
-    2:{c:'var(--yellow2)',cls:'r-mod',t:'Killip II — Suy tim nhẹ (ran <50%, tiếng T3) · Tử vong ~17%'},
-    3:{c:'var(--orange2)',cls:'r-high',t:'Killip III — Phù phổi cấp nặng (ran >50%) · Tử vong ~38%'},
-    4:{c:'var(--red2)',cls:'r-vhigh',t:'Killip IV — Sốc tim (HA <90, đầu chi lạnh) · Tử vong ~81%'},
-  };
-  const x = d[n];
-  document.getElementById('rn-killip').textContent = ['I','II','III','IV'][n-1];
-  document.getElementById('rn-killip').style.color = x.c;
-  setResult('killip', ['I','II','III','IV'][n-1], null, x.cls, x.t, []);
-}
-
-// NISSH
-function calcNissh() {
-  const ef = radioVal('ns-ef');
-  const cause = radioVal('ns-cause');
-  const checks = chkSum('#calc-nissh');
-  const s = ef + cause + checks;
-  const pct = Math.min(Math.round(s / 14 * 100), 100);
-  const bar = document.getElementById('nissh-bar');
-  bar.style.width = pct + '%';
-  const col = s <= 3 ? '#10b981' : s <= 6 ? '#f59e0b' : s <= 9 ? '#f97316' : '#ef4444';
-  bar.style.background = col;
-  let cls, txt, recs;
-  if(s<=3){cls='r-low';txt=`NISSH ${s} — Suy tim mức độ nhẹ`;recs=['Điều trị tứ trụ tối ưu','Xuất viện sau ổn định','Tái khám 1–2 tuần','Theo dõi cân nặng hàng ngày']}
-  else if(s<=6){cls='r-mod';txt=`NISSH ${s} — Suy tim mức độ trung bình`;recs=['Nhập viện điều trị nội khoa','Lợi tiểu IV hoặc liều cao uống','Tối ưu RAAS + BB + SGLT2i','Theo dõi creatinine và điện giải hàng ngày','Đánh giá lại sau 48–72 giờ']}
-  else if(s<=9){cls='r-high';txt=`NISSH ${s} — Suy tim mức độ nặng`;recs=['Nhập viện theo dõi tích cực','Lợi tiểu IV liều cao, cân nhắc phối hợp','Cân nhắc vận mạch (Dobutamine) nếu cung lượng thấp','Siêu âm tim đánh giá tại giường','Hội chẩn tim mạch can thiệp']}
-  else{cls='r-vhigh';txt=`NISSH ${s} — Suy tim rất nặng / Nguy cơ tử vong cao`;recs=['ICU / CCU ngay','Hỗ trợ tuần hoàn cơ học (IABP, Impella)','Cân nhắc ghép tim / LVAD khẩn','Đánh giá suy đa cơ quan','Thông báo gia đình, chuẩn bị kế hoạch chăm sóc giảm nhẹ nếu cần']}
-  setResult('nissh', s, col, cls, txt, recs);
-  storePendingScore('NISSH', s, cls.replace('r-',''));
-}
-
-// ══════════════════════════════════════════════
-// DRUGS DATABASE
-// ══════════════════════════════════════════════
-const DRUGS = [
-  {name:'Warfarin',gen:'Coumadin',cls:'anticoag',tags:['Kháng đông','VKA'],
-   dose:'2–10 mg/ngày, chỉnh theo INR\nMục tiêu INR 2.0–3.0 (van cơ học: 2.5–3.5)',
-   ind:'Rung nhĩ van tim, hẹp 2 lá nặng, VTE khi NOAC không phù hợp',
-   ci:'Thai kỳ (tuyệt đối), chảy máu đang hoạt động, tiểu cầu <50k',
-   inter:'Rất nhiều: kháng sinh, NSAIDs, omeprazole, amiodarone',
-   mon:'INR 2–4 tuần/lần khi ổn. Tránh rau xanh nhiều VitK',
-   warn:'Biến động INR nhiều. Cần giáo dục bệnh nhân kỹ về chế độ ăn và tương tác thuốc.'},
-  {name:'Apixaban',gen:'Eliquis',cls:'anticoag',tags:['Kháng đông','NOAC','Anti-Xa'],
-   dose:'AF: 5mg×2/ngày (2.5mg×2 nếu ≥2/3: tuổi≥80, cân≤60kg, Cr≥1.5)\nVTE điều trị: 10mg×2/7ngày → 5mg×2',
-   ind:'Rung nhĩ không do van tim, DVT/PE, dự phòng sau PT khớp',
-   ci:'CrCl <15 mL/min, chảy máu đang hoạt động, van tim cơ học',
-   inter:'Rifampicin (giảm HQ), Ketoconazole/Ritonavir (tăng nồng độ)',
-   mon:'Creatinine mỗi 6–12 tháng. Không cần anti-Xa thường quy',
-   warn:'Ít tương tác nhất trong NOAC. Chia 2 lần/ngày — không được quên buổi.'},
-  {name:'Rivaroxaban',gen:'Xarelto',cls:'anticoag',tags:['Kháng đông','NOAC','Anti-Xa'],
-   dose:'AF: 20mg/ngày cùng bữa tối (15mg nếu CrCl 15–50)\nVTE: 15mg×2/21 ngày → 20mg/ngày',
-   ind:'Rung nhĩ không do van tim, DVT/PE',
-   ci:'CrCl <15 mL/min, thai kỳ, van tim cơ học',
-   inter:'Tương tự Apixaban',
-   mon:'Creatinine mỗi 6–12 tháng',
-   warn:'Uống cùng bữa ăn QUAN TRỌNG (tăng hấp thu). 1 lần/ngày — dễ quên hơn Apixaban.'},
-  {name:'Dabigatran',gen:'Pradaxa',cls:'anticoag',tags:['Kháng đông','NOAC','Anti-IIa'],
-   dose:'AF: 150mg×2/ngày (110mg×2 nếu tuổi≥80, nguy cơ chảy máu cao)',
-   ind:'Rung nhĩ không do van tim, DVT/PE',
-   ci:'CrCl <30 mL/min (AF), P-gp inhibitor mạnh',
-   inter:'P-gp inhibitor: Ketoconazole, Verapamil, Amiodarone → tăng nồng độ đáng kể',
-   mon:'Creatinine mỗi 6–12 tháng. Cần CrCl >30 mL/min',
-   warn:'Có idarucizumab (Praxbind) để đảo ngược. Giữ trong lọ gốc, dễ ẩm.'},
-  {name:'Enoxaparin',gen:'Lovenox, Clexane',cls:'anticoag',tags:['Kháng đông','LMWH'],
-   dose:'Điều trị VTE: 1mg/kg×2/ngày SC\nDự phòng: 40mg/ngày SC\nNSTEMI: 1mg/kg×2/ngày',
-   ind:'DVT/PE cấp, NSTEMI, dự phòng VTE, cầu nối sang/từ Warfarin',
-   ci:'CrCl <30 (giảm liều 1mg/kg/ngày), HIT',
-   inter:'Kháng đông/tiểu cầu khác → tăng chảy máu',
-   mon:'Anti-Xa nếu thai kỳ, béo phì, suy thận. Tiểu cầu theo dõi HIT',
-   warn:'Ưu tiên trong thai kỳ. Tiêm SC bụng, xoay vị trí. KHÔNG tiêm IM.'},
-  {name:'Aspirin',gen:'Acetylsalicylic acid',cls:'antiplat',tags:['Kháng tiểu cầu','COX-1'],
-   dose:'Tim mạch: 75–100mg/ngày\nTải ACS: 300mg ngay\nKHÔNG >150mg dài hạn',
-   ind:'ACS, sau PCI, phòng thứ phát bệnh mạch vành, đột quỵ thiếu máu',
-   ci:'Loét DD đang hoạt động, dị ứng, trẻ <16 tuổi (Reye)',
-   inter:'Ibuprofen (cạnh tranh COX-1), Warfarin/kháng đông (tăng chảy máu)',
-   mon:'Triệu chứng tiêu hóa. Kết hợp PPI nếu nguy cơ cao',
-   warn:'KHÔNG dùng dự phòng tiên phát nếu không có bệnh tim mạch xác định (ESC 2021).'},
-  {name:'Clopidogrel',gen:'Plavix',cls:'antiplat',tags:['Kháng tiểu cầu','P2Y12'],
-   dose:'Tải: 300–600mg\nDuy trì: 75mg/ngày',
-   ind:'DAPT sau stent, ACS (thay thế Ticagrelor khi nguy cơ chảy máu cao)',
-   ci:'Chảy máu đang hoạt động, tiểu cầu <50k',
-   inter:'Omeprazole (giảm HQ qua CYP2C19). Ưu tiên Pantoprazole',
-   mon:'Tiểu cầu, triệu chứng chảy máu',
-   warn:'20–30% bệnh nhân chuyển hóa kém CYP2C19 → kém hiệu quả → cân nhắc Ticagrelor.'},
-  {name:'Ticagrelor',gen:'Brilinta',cls:'antiplat',tags:['Kháng tiểu cầu','P2Y12'],
-   dose:'Tải: 180mg\nDuy trì: 90mg×2/ngày (12th sau ACS)\n60mg×2 (sau 12th, dự phòng kéo dài)',
-   ind:'ACS (ưu tiên hơn Clopidogrel), sau PCI nguy cơ cao',
-   ci:'Tiền sử chảy máu nội sọ, suy gan nặng',
-   inter:'Simvastatin >40mg (rhabdomyolysis), Digoxin, CYP3A4 inhibitor/inducer mạnh',
-   mon:'Khó thở (14–20%, thường tự hết). Chảy máu',
-   warn:'Khó thở không phải chống chỉ định, thường tự hết. Không bẻ viên.'},
-  {name:'Bisoprolol',gen:'Concor, Cardicor',cls:'bb',tags:['Beta-blocker','β₁ chọn lọc'],
-   dose:'Suy tim: bắt đầu 1.25mg → đích 10mg/ngày (tăng mỗi 2 tuần)\nTHA: 5–20mg/ngày\nRN: 2.5–10mg/ngày',
-   ind:'HFrEF (Class I), THA, Rung nhĩ kiểm soát tần số, sau NMCT',
-   ci:'Block AV độ 2–3, nhịp <50, hen phế quản nặng, co thắt phế quản cấp, sốc tim',
-   inter:'Verapamil/Diltiazem (nguy cơ block AV), Digoxin (nhịp chậm cộng hưởng)',
-   mon:'Nhịp tim, HA. Không ngưng đột ngột',
-   warn:'Tăng liều từ từ trong suy tim. KHÔNG ngưng đột ngột (nguy cơ tăng nhịp phản hồi).'},
-  {name:'Carvedilol',gen:'Dilatrend',cls:'bb',tags:['Beta-blocker','α₁+β blocker'],
-   dose:'Suy tim: 3.125mg×2 → đích 25–50mg×2/ngày\nTHA: 12.5–25mg×2/ngày',
-   ind:'HFrEF (Class I), THA, đau thắt ngực',
-   ci:'Tương tự Bisoprolol + thận trọng ĐTĐ (che dấu hạ đường huyết)',
-   inter:'CYP2D6 inhibitor (Fluoxetine, Paroxetine) → tăng nồng độ',
-   mon:'HA tư thế (α₁ block), nhịp tim, đường huyết',
-   warn:'Uống cùng bữa ăn để giảm tụt HA tư thế. Dùng 2 lần/ngày.'},
-  {name:'Metoprolol succinate',gen:'Betaloc ZOK',cls:'bb',tags:['Beta-blocker','β₁ chọn lọc','XL'],
-   dose:'Suy tim: 12.5–25mg/ngày → đích 200mg/ngày\nTHA: 50–200mg/ngày (dạng XL)',
-   ind:'HFrEF, THA, sau NMCT, RN, đau thắt ngực',
-   ci:'Tương tự Bisoprolol',
-   inter:'Tương tự Bisoprolol',
-   mon:'Nhịp tim, HA',
-   warn:'CHỈ dùng dạng succinate (XL/ZOK) trong suy tim. KHÔNG dùng dạng tartrate.'},
-  {name:'Ramipril',gen:'Tritace',cls:'raas',tags:['RAAS','ACEI'],
-   dose:'Bắt đầu 2.5mg/ngày → đích 10mg/ngày\nSuy tim: bắt đầu 1.25mg/ngày',
-   ind:'THA, HFrEF, sau NMCT, bảo vệ thận ĐTĐ/CKD, phòng ngừa CV (HOPE)',
-   ci:'Thai kỳ (tuyệt đối), phù mạch tiền sử ACEI, hẹp ĐM thận 2 bên, K⁺>5.5',
-   inter:'KHÔNG phối hợp ACEI+ARB. Kali, Spironolactone (tăng kali)',
-   mon:'K⁺, creatinine sau 1–2 tuần khởi đầu. Cr tăng <30% chấp nhận',
-   warn:'Ho khan 5–20% do bradykinin → chuyển ARB. Tuyệt đối không dùng trong thai kỳ.'},
-  {name:'Valsartan',gen:'Diovan',cls:'raas',tags:['RAAS','ARB'],
-   dose:'THA: 80–320mg/ngày\nSuy tim: 40mg×2 → đích 160mg×2/ngày',
-   ind:'THA, HFrEF (khi ACEI không dung nạp), sau NMCT với HF',
-   ci:'Thai kỳ, hẹp ĐM thận 2 bên, K⁺>5.5',
-   inter:'Kali, lợi tiểu giữ kali. Lithium (tăng Li)',
-   mon:'K⁺, creatinine tương tự ACEI',
-   warn:'Ít gây ho hơn ACEI. Thay thế khi bệnh nhân ho do ACEI.'},
-  {name:'Sacubitril/Valsartan',gen:'Entresto',cls:'raas',tags:['RAAS','ARNI','HFrEF'],
-   dose:'Bắt đầu 24/26mg×2 → đích 97/103mg×2/ngày\nWashout 36h nếu chuyển từ ACEI',
-   ind:'HFrEF NYHA II–IV (EF≤40%) — ưu tiên hơn ACEI/ARB (PARADIGM-HF trial)',
-   ci:'Thai kỳ, tiền sử phù mạch do ACEI/ARNI, đang dùng ACEI trong 36h',
-   inter:'TUYỆT ĐỐI không dùng đồng thời ACEI (nguy cơ phù mạch)',
-   mon:'K⁺, creatinine, HA. Tăng liều mỗi 2–4 tuần',
-   warn:'PHẢI ngưng ACEI ít nhất 36 giờ trước khi bắt đầu ARNI. Nguy cơ phù mạch cao nếu vi phạm.'},
-  {name:'Furosemide',gen:'Lasix',cls:'diuretic',tags:['Lợi tiểu quai','Loop'],
-   dose:'Uống: 20–80mg/ngày (1–2 lần)\nIV cấp: 20–200mg\nTruyền TM liên tục: 5–20mg/giờ',
-   ind:'Phù do suy tim, xơ gan, hội chứng thận hư. THA kháng trị. Phù phổi cấp',
-   ci:'Vô niệu do tắc nghẽn, dị ứng sulfonamide (tương đối)',
-   inter:'Aminoglycoside (độc thận/tai), NSAIDs (giảm hiệu quả), Digoxin (hạ K⁺ tăng độc)',
-   mon:'K⁺, Na⁺, Mg²⁺, creatinine, cân nặng hàng ngày',
-   warn:'Theo dõi kali sát khi liều cao hoặc kết hợp Digoxin. Hạ K⁺ → tăng độc tính Digoxin.'},
-  {name:'Spironolactone',gen:'Aldactone',cls:'diuretic',tags:['Lợi tiểu giữ kali','MRA'],
-   dose:'Suy tim: 25–50mg/ngày\nTHA kháng trị: 25–100mg/ngày',
-   ind:'HFrEF NYHA II–IV (EF≤35%), THA kháng trị (bậc 4), Cường aldosterone',
-   ci:'K⁺>5.0, CrCl<30 (thận trọng), ACEI+ARB kết hợp',
-   inter:'ACEI/ARB (tăng kali cộng hưởng), NSAIDs (giảm hiệu quả)',
-   mon:'K⁺ sau 1 tuần, 1 tháng, rồi 3–6 tháng. Creatinine',
-   warn:'Gynecomastia 9–10% (liều cao). Chuyển Eplerenone nếu gặp. Theo dõi kali nghiêm ngặt.'},
-  {name:'Dapagliflozin',gen:'Farxiga',cls:'diuretic',tags:['SGLT2i','HFrEF','HFpEF'],
-   dose:'10mg/ngày — bất kể có ĐTĐ hay không',
-   ind:'HFrEF EF≤40% (DAPA-HF), HFpEF (DELIVER), T2DM bảo vệ tim-thận',
-   ci:'eGFR <25, nhiễm toan ceton ĐTĐ, UTI/nhiễm trùng sinh dục đang hoạt động',
-   inter:'Lợi tiểu (tăng nguy cơ mất nước), Insulin (giảm liều insulin)',
-   mon:'eGFR, điện giải, dấu hiệu mất nước, nhiễm trùng sinh dục',
-   warn:'NGỪNG trước PT lớn hoặc nhịn ăn kéo dài (DKA euglycemic). Nhiễm nấm sinh dục.'},
-  {name:'Empagliflozin',gen:'Jardiance',cls:'diuretic',tags:['SGLT2i','HFrEF','HFpEF'],
-   dose:'10mg/ngày (có thể tăng 25mg)',
-   ind:'HFrEF/HFpEF (EMPEROR trials), T2DM + nguy cơ CV cao/CKD',
-   ci:'Tương tự Dapagliflozin',
-   inter:'Tương tự Dapagliflozin',
-   mon:'eGFR, điện giải',
-   warn:'Tương tự Dapagliflozin. Không dùng T1DM. Ngưng trước PT lớn.'},
-  {name:'Atorvastatin',gen:'Lipitor, Storvas',cls:'statin',tags:['Statin','HMG-CoA'],
-   dose:'Liều thấp: 10–20mg/ngày\nLiều cao (ACS/nguy cơ cao): 40–80mg/ngày',
-   ind:'Rối loạn lipid, phòng ngừa CV tiên/thứ phát, ACS (liều cao ngay lập tức)',
-   ci:'Bệnh gan đang hoạt động, mang thai/CCSN, AST/ALT >3×ULN',
-   inter:'Cyclosporine, Gemfibrozil (rhabdomyolysis), Macrolide, Azole antifungal',
-   mon:'LDL-C. AST/ALT ban đầu. CK nếu đau cơ. Đường huyết (tăng nguy cơ ĐTĐ nhẹ)',
-   warn:'Đau cơ thường gặp nhưng rhabdomyolysis hiếm gặp. Kiểm tra CK khi đau cơ nhiều.'},
-  {name:'Rosuvastatin',gen:'Crestor',cls:'statin',tags:['Statin','HMG-CoA'],
-   dose:'5–40mg/ngày\nLiều cao: 20–40mg\nNgười châu Á: bắt đầu liều thấp',
-   ind:'Tương tự Atorvastatin; mạnh hơn trong giảm LDL',
-   ci:'Tương tự Atorvastatin; CrCl <30: không dùng 40mg',
-   inter:'Ít tương tác CYP3A4 hơn Atorvastatin',
-   mon:'LDL-C, enzyme gan',
-   warn:'Người châu Á: nồng độ cao hơn → khởi đầu liều thấp (5–10mg).'},
-  {name:'Amiodarone',gen:'Cordarone',cls:'antiarr',tags:['Loạn nhịp','Class III'],
-   dose:'AF cấp IV: 150mg/10 phút → 1mg/phút × 6h → 0.5mg/phút\nUống: tải 200mg×3/4tuần → 100–200mg/ngày duy trì',
-   ind:'Rung nhĩ kiểm soát nhịp (đặc biệt HF/bệnh tim thực thể), VT, phòng VF',
-   ci:'Block xoang/AV cao, rối loạn giáp không kiểm soát, thai/CCSN',
-   inter:'Warfarin (↑INR mạnh, giảm 30–50% liều), Digoxin (×2), Statin (rhabdo), QT kéo dài',
-   mon:'TSH/T4, AST/ALT, Xquang phổi, ECG (QT), khám mắt — mỗi 6–12 tháng',
-   warn:'Bán thải rất dài 40–55 ngày. TDP nghiêm trọng: viêm phổi, độc tuyến giáp, độc gan. Theo dõi suốt đời.'},
-  {name:'Digoxin',gen:'Lanoxin',cls:'antiarr',tags:['Loạn nhịp','Glycoside'],
-   dose:'0.125–0.25mg/ngày\nGiảm liều: suy thận, người cao tuổi, nhẹ cân\nNồng độ tối ưu suy tim: 0.5–0.9 ng/mL',
-   ind:'HFrEF triệu chứng dai dẳng (Class IIb), AF kiểm soát tần số',
-   ci:'Block AV độ 2–3, WPW, phì đại cơ tim tắc nghẽn nặng',
-   inter:'Amiodarone (×2 Digoxin), Verapamil (↑), Quinidine (↑), Hạ kali (↑ độc tính)',
-   mon:'Nồng độ huyết tương Digoxin, K⁺, Mg²⁺, ECG. Khoảng điều trị hẹp!',
-   warn:'Ngộ độc: buồn nôn, rối loạn thị giác, loạn nhịp. Hạ kali làm TĂNG ĐỘC TÍNH → K⁺ luôn >4 mmol/L.'},
-  {name:'Amlodipine',gen:'Norvasc',cls:'ccb',tags:['CCB','Dihydropyridine'],
-   dose:'THA: bắt đầu 5mg → tối đa 10mg/ngày\nĐau thắt ngực: 5–10mg/ngày',
-   ind:'THA (đơn hoặc phối hợp), đau thắt ngực ổn định, co thắt mạch vành',
-   ci:'Sốc tim, hẹp ĐMC nặng có triệu chứng',
-   inter:'Cyclosporine, Simvastatin >20mg (↑ Simvastatin)',
-   mon:'HA, phù mắt cá chân',
-   warn:'Phù mắt cá chân (15–20%) — do giãn mạch ngoại vi, không phải sung huyết tim. Bán thải dài 35–50h.'},
-  {name:'Isosorbide dinitrate',gen:'Isoket, Isordil',cls:'nitrate',tags:['Nitrate','Giãn mạch'],
-   dose:'Dưới lưỡi cấp: 5mg, nhắc mỗi 5 phút ×3\nUống: 10–40mg × 2–3 lần/ngày\nIV: 1–10mg/giờ',
-   ind:'Đau thắt ngực cấp/mạn, suy tim cấp (IV), THA hypertensive crisis',
-   ci:'PDE5 inhibitor trong 24–48h (Sildenafil/Tadalafil), HA tâm thu <90, hạ thể tích',
-   inter:'PDE5 inhibitor: TUYỆT ĐỐI TRÁNH (tụt HA nặng, có thể tử vong)',
-   mon:'HA, nhịp tim, đau đầu (TDP thường gặp)',
-   warn:'TUYỆT ĐỐI không dùng cùng Viagra/Cialis/Levitra. Dung nạp nếu dùng liên tục → khoảng nghỉ 8–12h.'},
-  {name:'Nitroglycerin',gen:'NTG, Nitrostat',cls:'nitrate',tags:['Nitrate','Cấp cứu'],
-   dose:'Dưới lưỡi: 0.4mg, nhắc 5 phút × 3\nPatch: 5–15mg/24h\nIV: 5–200 mcg/phút',
-   ind:'Đau thắt ngực cấp, phù phổi cấp, THA khẩn cấp IV',
-   ci:'Tương tự Isosorbide',
-   inter:'PDE5 inhibitor (TUYỆT ĐỐI)',
-   mon:'HA mỗi 3–5 phút khi dùng IV',
-   warn:'Bảo quản trong lọ kín, tránh ánh sáng. Hiệu quả giảm khi để lâu sau khi mở. Nhức đầu thường gặp.'},
+// "use client"  ← thêm vào đầu file trong Next.js
+// lib/nihss.ts   ← trong production, NIHSS_ITEMS và nihssInterp tách ra file riêng
+
+import { useState, useRef, useEffect } from "react";
+import {
+  Heart, Brain, Pill, MessageSquare, Home, LogOut,
+  User, Lock, Send, Loader2, Activity, Bot,
+  AlertTriangle, CheckCircle, Clock, RefreshCw,
+  ChevronRight, X, Shield, Stethoscope, ChevronDown,
+  Eye, Hand, Ear, Zap, FileText, BarChart3
+} from "lucide-react";
+
+// ═══════════════════════════════════════════════════════════
+// lib/nihss.ts — Tách ra file riêng trong production
+// ═══════════════════════════════════════════════════════════
+const NIHSS_ITEMS = [
+  { id:"1a", label:"1a. Mức độ ý thức (LOC)",
+    note:"Đánh giá phản ứng khi gọi tên, không kích thích đau trừ khi không đáp ứng",
+    opts:[[0,"Tỉnh táo, đáp ứng nhanh, phù hợp"],[1,"Không hoàn toàn tỉnh — gọi dậy được, thực hiện lệnh đơn giản"],[2,"Lơ mơ — cần kích thích lặp lại hoặc đau để thực hiện cử động"],[3,"Hôn mê — chỉ còn phản xạ hoặc mất đáp ứng, mềm nhũn"]] },
+  { id:"1b", label:"1b. LOC — Câu hỏi",
+    note:"Hỏi: 'Tháng này là tháng mấy?' và 'Bạn bao nhiêu tuổi?' — KHÔNG gợi ý",
+    opts:[[0,"Trả lời đúng cả 2 câu hỏi"],[1,"Đúng 1 câu, hoặc có rào cản (đặt NKQ, thất ngôn, chấn thương)"],[2,"Không trả lời đúng câu nào / không nói được"]] },
+  { id:"1c", label:"1c. LOC — Lệnh",
+    note:"Yêu cầu: 'Mở rồi nhắm mắt' và 'Nắm rồi mở tay (tay không liệt)' — gật đầu nếu mất ngôn ngữ",
+    opts:[[0,"Thực hiện đúng cả 2 lệnh"],[1,"Thực hiện đúng 1 lệnh"],[2,"Không thực hiện được lệnh nào"]] },
+  { id:"2", label:"2. Vận nhãn tốt nhất",
+    note:"Chỉ đánh giá cử động nằm ngang; che mắt bên liệt nếu có liệt nhìn do tổn thương nhãn cầu đơn thuần",
+    opts:[[0,"Bình thường"],[1,"Liệt vận nhãn bán phần — lệch hướng được điều chỉnh hoặc không đầy biên độ"],[2,"Lệch nhãn cầu cưỡng bức không điều chỉnh được / liệt vận nhãn hoàn toàn"]] },
+  { id:"3", label:"3. Thị trường",
+    note:"Kiểm tra bằng đối chiếu (confrontation) hoặc đe dọa (threat) — đánh giá cả 4 góc phần tư",
+    opts:[[0,"Thị trường bình thường"],[1,"Bán manh phần (partial hemianopia)"],[2,"Bán manh hoàn toàn"],[3,"Mù hoàn toàn cả 2 bên hoặc mù vỏ não"]] },
+  { id:"4", label:"4. Liệt mặt",
+    note:"Yêu cầu nhe răng, nhắm mắt chặt, cau mày. BN hôn mê: quan sát khi có kích thích đau",
+    opts:[[0,"Đối xứng bình thường"],[1,"Liệt nhẹ — nếp mũi-má mờ, mất đối xứng khi cười"],[2,"Liệt nặng mặt dưới — không cử động được 1 bên, đối xứng mặt trên"],[3,"Liệt hoàn toàn — mất cử động 1 hoặc 2 bên, cả mặt trên lẫn dưới"]] },
+  { id:"5a", label:"5a. Vận động tay — Trái",
+    note:"Giơ tay 90° (ngồi) hoặc 45° (nằm); giữ 10 giây. Ghi UN nếu cụt/cứng khớp",
+    opts:[[0,"Không rơi trong 10 giây"],[1,"Rơi trước 10s nhưng không chạm giường"],[2,"Có nỗ lực chống trọng lực nhưng rơi xuống giường trong 10s"],[3,"Không chống được trọng lực, rơi ngay"],[4,"Không cử động / liệt hoàn toàn"]] },
+  { id:"5b", label:"5b. Vận động tay — Phải",
+    note:"Giơ tay 90° (ngồi) hoặc 45° (nằm); giữ 10 giây. Ghi UN nếu cụt/cứng khớp",
+    opts:[[0,"Không rơi trong 10 giây"],[1,"Rơi trước 10s nhưng không chạm giường"],[2,"Có nỗ lực chống trọng lực nhưng rơi xuống giường trong 10s"],[3,"Không chống được trọng lực, rơi ngay"],[4,"Không cử động / liệt hoàn toàn"]] },
+  { id:"6a", label:"6a. Vận động chân — Trái",
+    note:"Nâng chân 30° khi nằm ngửa; giữ 5 giây. Ghi UN nếu cụt/cứng khớp",
+    opts:[[0,"Không rơi trong 5 giây"],[1,"Rơi trước 5s, không chạm giường"],[2,"Có nỗ lực chống trọng lực nhưng rơi trong 5s"],[3,"Không chống được trọng lực, rơi ngay"],[4,"Không cử động / liệt hoàn toàn"]] },
+  { id:"6b", label:"6b. Vận động chân — Phải",
+    note:"Nâng chân 30° khi nằm ngửa; giữ 5 giây. Ghi UN nếu cụt/cứng khớp",
+    opts:[[0,"Không rơi trong 5 giây"],[1,"Rơi trước 5s, không chạm giường"],[2,"Có nỗ lực chống trọng lực nhưng rơi trong 5s"],[3,"Không chống được trọng lực, rơi ngay"],[4,"Không cử động / liệt hoàn toàn"]] },
+  { id:"7", label:"7. Thất điều chi (Ataxia)",
+    note:"Ngón tay-mũi và gót chân-ống chân; CHỈ tính điểm nếu thất điều không do liệt",
+    opts:[[0,"Không có thất điều"],[1,"Thất điều rõ ở 1 chi"],[2,"Thất điều rõ ở 2 chi"]] },
+  { id:"8", label:"8. Cảm giác",
+    note:"Kim châm hoặc kích thích đau nếu rối loạn ý thức; kiểm tra cả tứ chi và mặt",
+    opts:[[0,"Cảm giác bình thường"],[1,"Giảm cảm giác nhẹ-vừa — cảm thấy ít đau nhọn hơn bên liệt"],[2,"Mất cảm giác nặng hoặc hoàn toàn — không cảm nhận được"]] },
+  { id:"9", label:"9. Ngôn ngữ tốt nhất",
+    note:"Yêu cầu mô tả tranh, đọc câu, gọi tên đồ vật — BN đặt NKQ: dùng bảng chữ cái",
+    opts:[[0,"Không mất ngôn ngữ"],[1,"Thất ngôn nhẹ-vừa — còn nói được nhưng thiếu từ, đặt câu sai, giảm trôi chảy"],[2,"Thất ngôn nặng — chỉ giao tiếp được mức tối thiểu"],[3,"Câm, thất ngôn toàn bộ, hoặc hôn mê không test được"]] },
+  { id:"10", label:"10. Dysarthria (Nói ngọng)",
+    note:"Yêu cầu đọc/nhắc lại danh sách từ chuẩn; không tính nếu do thất ngôn",
+    opts:[[0,"Phát âm bình thường"],[1,"Nói ngọng nhẹ-vừa — nói thiếu rõ ràng nhưng vẫn hiểu được"],[2,"Nói ngọng nặng — khó hoặc không hiểu được (không do thất ngôn); câm/đặt NKQ"]] },
+  { id:"11", label:"11. Vô chú ý / Xao lãng (Extinction)",
+    note:"Kích thích đồng thời 2 bên (xúc giác và/hoặc thị giác); CHỈ tính nếu cảm giác trước đó còn nguyên vẹn",
+    opts:[[0,"Bình thường, không có bất thường"],[1,"Vô chú ý hoặc xao lãng với kích thích một cơ quan cảm giác"],[2,"Xao lãng nặng hơn 1 cơ quan — không nhận ra bàn tay mình / bản thân"]] },
 ];
 
-function renderDrugs(list) {
-  const d = document.getElementById('drug-list');
-  if(!list.length){d.innerHTML='<div class="empty"><div class="empty-ico">💊</div><div class="empty-txt">Không tìm thấy thuốc</div></div>';return}
-  d.innerHTML = list.map(x=>`
-    <div class="dcard" data-cls="${x.cls}">
-      <div class="d-head" onclick="this.parentElement.classList.toggle('open');this.querySelector('.darrow').style.transform=this.parentElement.classList.contains('open')?'rotate(180deg)':''">
-        <div>
-          <div class="d-name">${x.name}</div>
-          <div class="d-gen">${x.gen}</div>
-          <div class="d-tags">${x.tags.map(t=>`<span class="badge ${tagColor(t)}">${t}</span>`).join('')}</div>
-        </div>
-        <span class="darrow" style="font-size:11px;color:var(--text3)">▼</span>
-      </div>
-      <div class="d-body"><div class="d-inner">
-        <table class="dtable">
-          <tr><td>Liều dùng</td><td>${x.dose.replace(/\n/g,'<br>')}</td></tr>
-          <tr><td>Chỉ định</td><td>${x.ind}</td></tr>
-          <tr><td>Chống chỉ định</td><td>${x.ci}</td></tr>
-          <tr><td>Tương tác</td><td>${x.inter}</td></tr>
-          <tr><td>Theo dõi</td><td>${x.mon}</td></tr>
-        </table>
-        ${x.warn?`<div class="warn-box">⚠️ ${x.warn}</div>`:''}
-      </div></div>
-    </div>`).join('');
+function nihssInterp(s) {
+  if (s === 0) return { label:"Không thiếu sót", sub:"Đánh giá lại nếu nghi ngờ lâm sàng", bg:"#f0fdf4", border:"#86efac", color:"#166534", ring:"#22c55e" };
+  if (s <= 4)  return { label:"Nhẹ (1–4)", sub:"Cân nhắc rtPA nếu trong cửa sổ & đủ tiêu chuẩn", bg:"#eff6ff", border:"#93c5fd", color:"#1e40af", ring:"#3b82f6" };
+  if (s <= 15) return { label:"Trung bình (5–15)", sub:"Chỉ định rtPA — đánh giá hình ảnh khẩn", bg:"#fefce8", border:"#fde047", color:"#713f12", ring:"#eab308" };
+  if (s <= 20) return { label:"Trung bình–Nặng (16–20)", sub:"Xem xét lấy huyết khối cơ học — CTA/MRA ngay", bg:"#fff7ed", border:"#fdba74", color:"#9a3412", ring:"#f97316" };
+  return { label:"Nặng (21–42)", sub:"Ưu tiên lấy huyết khối — đánh giá lõi nhồi máu", bg:"#fef2f2", border:"#fca5a5", color:"#991b1b", ring:"#ef4444" };
 }
 
-function tagColor(t){
-  if(['Kháng đông','NOAC','LMWH','VKA','Anti-Xa','Anti-IIa'].some(x=>t.includes(x))) return 'b-blue';
-  if(['Kháng tiểu cầu','P2Y12','COX-1'].some(x=>t.includes(x))) return 'b-orange';
-  if(['Beta-blocker','β₁'].some(x=>t.includes(x))) return 'b-purple';
-  if(['RAAS','ACEI','ARB','ARNI'].some(x=>t.includes(x))) return 'b-green';
-  if(['Statin','HMG-CoA'].some(x=>t.includes(x))) return 'b-yellow';
-  if(['Lợi tiểu','MRA','SGLT2i','Loop'].some(x=>t.includes(x))) return 'b-cyan';
-  if(['Loạn nhịp','Class III','Glycoside'].some(x=>t.includes(x))) return 'b-red';
-  if(['CCB','Dihydro'].some(x=>t.includes(x))) return 'b-pink';
-  if(['Nitrate','Giãn','Cấp cứu'].some(x=>t.includes(x))) return 'b-yellow';
-  return 'b-blue';
-}
+// Drug data
+const DRUGS = [
+  { name:"Alteplase (rtPA)", cls:"Tiêu sợi huyết", color:"#dc2626",
+    dose:"0.9 mg/kg IV — tối đa 90 mg\n• 10% liều đầu: bolus trong 1 phút\n• 90% còn lại: truyền IV trong 60 phút\nVD: 70 kg → 63 mg tổng (6.3 mg bolus + 56.7 mg/60 phút)",
+    ind:"Đột quỵ TMCB cấp ≤ 4.5h khởi phát (chọn lọc). NIHSS ≥ 4 hoặc triệu chứng vô hiệu hóa bất kể điểm số.",
+    ci:"Xuất huyết nội sọ trên CT; PT > 15s / INR > 1.7; tiểu cầu < 100k; HA ≥ 185/110 (sau kiểm soát); phẫu thuật lớn < 3 tháng; đột quỵ/chấn thương đầu nặng < 3 tháng",
+    mon:"HA mỗi 15 phút × 2h đầu; sau đó mỗi 30 phút × 6h. Không kháng đông/kháng tiểu cầu trong 24h. CT kiểm tra sau 24h." },
+  { name:"Labetalol", cls:"Hạ huyết áp IV", color:"#2563eb",
+    dose:"10–20 mg IV bolus, nhắc lại mỗi 10 phút nếu cần (tối đa 300 mg)\nHoặc truyền 2–8 mg/phút IV\nKhông dùng nếu nhịp tim < 60 l/phút",
+    ind:"Hạ HA trước rtPA (mục tiêu < 185/110). Kiểm soát HA trong 24h sau rtPA (mục tiêu < 180/105).",
+    ci:"Nhịp chậm, block AV độ 2–3, suy tim nặng, hen phế quản/co thắt phế quản nặng",
+    mon:"HA và nhịp tim liên tục. Theo dõi dấu hiệu suy tim." },
+  { name:"Nicardipine", cls:"Hạ huyết áp IV", color:"#2563eb",
+    dose:"Bắt đầu 5 mg/giờ IV, tăng 2.5 mg/giờ mỗi 5–15 phút\nTối đa 15 mg/giờ — chỉnh liều đến đích HA",
+    ind:"Kiểm soát HA trong/sau rtPA khi Labetalol không đủ hoặc chống chỉ định. THA khẩn cấp trong đột quỵ cấp.",
+    ci:"Hẹp động mạch chủ nặng có triệu chứng",
+    mon:"HA liên tục, điện giải, nhịp tim." },
+  { name:"Aspirin", cls:"Kháng tiểu cầu", color:"#d97706",
+    dose:"300 mg uống hoặc đặt hậu môn ngay sau chẩn đoán\n(nếu KHÔNG dùng rtPA)\nDuy trì: 81–100 mg/ngày",
+    ind:"Điều trị cấp đột quỵ TMCB không dùng rtPA — giảm nguy cơ tái phát sớm. Sau 24h nếu đã dùng rtPA.",
+    ci:"Không dùng trong 24h sau rtPA. Dị ứng Aspirin, loét DD đang hoạt động.",
+    mon:"Dấu hiệu xuất huyết tiêu hóa." },
+  { name:"Enoxaparin (LMWH)", cls:"Kháng đông", color:"#7c3aed",
+    dose:"Điều trị: 1 mg/kg × 2/ngày SC\nDự phòng DVT: 40 mg/ngày SC\nSuy thận nặng (CrCl < 30): giảm liều",
+    ind:"Phòng DVT/PE trong đột quỵ (sau 24–48h). Rung nhĩ nguy cơ cao sau loại trừ xuất huyết chuyển dạng.",
+    ci:"Xuất huyết chuyển dạng, nhồi máu lớn, tiểu cầu < 100k, HIT",
+    mon:"Tiểu cầu (HIT), anti-Xa ở suy thận/thai kỳ." },
+  { name:"Atorvastatin", cls:"Statin", color:"#059669",
+    dose:"40–80 mg/ngày uống\nBắt đầu ngay trong giai đoạn cấp — bất kể mức LDL",
+    ind:"Tất cả đột quỵ TMCB — giảm nguy cơ tái phát tim mạch. Mục tiêu LDL < 70 mg/dL (nguy cơ rất cao: < 55).",
+    ci:"Bệnh gan đang hoạt động, mang thai/CCSN, AST/ALT > 3× ULN",
+    mon:"LDL-C, AST/ALT ban đầu. CK nếu đau cơ." },
+];
 
-let currentClass = 'all';
-function filterDrugs(q) {
-  const lower = q.toLowerCase();
-  document.querySelectorAll('.dcard').forEach(c => {
-    const txt = c.textContent.toLowerCase();
-    const clsMatch = currentClass === 'all' || c.dataset.cls === currentClass;
-    c.style.display = (txt.includes(lower) && clsMatch) ? '' : 'none';
-  });
-}
-function filterClass(cls, el) {
-  currentClass = cls;
-  document.querySelectorAll('.fchip').forEach(c => c.classList.remove('on'));
-  el.classList.add('on');
-  filterDrugs(document.getElementById('drug-search').value);
-}
+const S = (prop, val) => ({ [prop]: val });
 
-renderDrugs(DRUGS);
+// ═══════════════════════════════════════════════════════════
+// LOGIN PAGE
+// ═══════════════════════════════════════════════════════════
+function LoginPage({ onLogin }) {
+  const [email, setEmail] = useState("");
+  const [pw, setPw] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [err, setErr] = useState("");
 
-// ══════════════════════════════════════════════
-// PROTOCOLS
-// ══════════════════════════════════════════════
-function openProto(id) {
-  document.querySelectorAll('.proto').forEach(p => p.classList.remove('show'));
-  document.querySelectorAll('.ptab').forEach(t => t.classList.remove('on'));
-  document.getElementById('proto-' + id).classList.add('show');
-  document.getElementById('pt-' + id).classList.add('on');
-}
-
-// ══════════════════════════════════════════════
-// PATIENT STORAGE (localStorage)
-// ══════════════════════════════════════════════
-let patients = [];
-let currentPatientId = null;
-let pendingScores = {};
-
-function storePendingScore(name, val, risk) {
-  pendingScores[name] = {val, risk, date: new Date().toLocaleDateString('vi-VN')};
-}
-
-function loadPatients() {
-  try {
-    const raw = localStorage.getItem('cardiomd_patients');
-    patients = raw ? JSON.parse(raw) : [];
-  } catch(e) { patients = []; }
-  renderPatients();
-  updateStats();
-}
-
-function savePatients() {
-  try { localStorage.setItem('cardiomd_patients', JSON.stringify(patients)); } catch(e){}
-}
-
-function updateStats() {
-  const today = new Date().toLocaleDateString('vi-VN');
-  document.getElementById('pt-total').textContent = patients.length;
-  document.getElementById('hs-pts').textContent = patients.length;
-  document.getElementById('pt-highrisk').textContent = patients.filter(p =>
-    Object.values(p.scores||{}).some(s => s.risk === 'high' || s.risk === 'vhigh')
-  ).length;
-  document.getElementById('pt-recent').textContent = patients.filter(p => p.created === today).length;
-}
-
-function renderPatients() {
-  const list = document.getElementById('patient-list');
-  const empty = document.getElementById('pat-empty');
-  if(!patients.length) { list.innerHTML = ''; list.appendChild(empty); return; }
-  list.innerHTML = patients.map((p,i) => `
-    <div class="pat-card" onclick="openPatient(${i})">
-      <div class="pat-row">
-        <div>
-          <div class="pat-name">${p.name}</div>
-          <div class="pat-meta">${p.age ? p.age + ' tuổi · ' : ''}${p.sex} · ${p.dx || 'Chưa phân loại'} · ${p.created}</div>
-        </div>
-        <span class="badge ${riskBadge(p)}">${riskLabel(p)}</span>
-      </div>
-      ${Object.keys(p.scores||{}).length ? `<div class="pat-scores">${Object.entries(p.scores).map(([k,v])=>`<span class="pat-score-tag">${k}: ${v.val}</span>`).join('')}</div>` : ''}
-    </div>
-  `).join('');
-}
-
-function riskBadge(p) {
-  const risks = Object.values(p.scores||{}).map(s=>s.risk);
-  if(risks.includes('vhigh')) return 'b-red';
-  if(risks.includes('high')) return 'b-orange';
-  if(risks.includes('mod')) return 'b-yellow';
-  return 'b-green';
-}
-function riskLabel(p) {
-  const risks = Object.values(p.scores||{}).map(s=>s.risk);
-  if(risks.includes('vhigh')) return 'Rất cao';
-  if(risks.includes('high')) return 'Cao';
-  if(risks.includes('mod')) return 'TB';
-  return 'Thấp';
-}
-
-function showAddPatient() {
-  const f = document.getElementById('add-pat-form');
-  f.style.display = f.style.display === 'none' ? 'block' : 'none';
-  if(f.style.display==='block') { pendingScores = {}; f.scrollIntoView({behavior:'smooth',block:'start'}); }
-}
-function hideAddPatient() { document.getElementById('add-pat-form').style.display='none'; }
-
-function savePatient() {
-  const name = document.getElementById('pf-name').value.trim();
-  if(!name) { showToast('⚠️ Vui lòng nhập họ và tên'); return; }
-  const dxEl = document.querySelector('#pf-dx .rbtn.on');
-  const p = {
-    id: Date.now(),
-    name,
-    age: document.getElementById('pf-age').value,
-    sex: document.getElementById('pf-sex').value,
-    pid: document.getElementById('pf-id').value,
-    dx: dxEl ? dxEl.dataset.val : '',
-    note: document.getElementById('pf-note').value,
-    scores: {...pendingScores},
-    created: new Date().toLocaleDateString('vi-VN'),
+  const submit = async (e) => {
+    e.preventDefault();
+    setLoading(true); setErr("");
+    await new Promise(r => setTimeout(r, 900));
+    // Production: thay bằng supabase.auth.signInWithPassword({ email, password: pw })
+    if (email.includes("@") && pw.length >= 4) {
+      onLogin({ email, name: email.split("@")[0].replace(/[._]/g," ") });
+    } else {
+      setErr("Email không hợp lệ hoặc mật khẩu quá ngắn. (Demo: email hợp lệ + ≥4 ký tự)");
+    }
+    setLoading(false);
   };
-  patients.unshift(p);
-  savePatients();
-  renderPatients();
-  updateStats();
-  hideAddPatient();
-  // Clear form
-  ['pf-name','pf-age','pf-id','pf-note'].forEach(id => document.getElementById(id).value='');
-  document.querySelectorAll('#pf-dx .rbtn').forEach(b=>b.classList.remove('on'));
-  pendingScores = {};
-  showToast('✅ Đã lưu bệnh nhân: ' + name);
+
+  const inp = {
+    style:{ width:"100%", padding:"11px 12px 11px 38px", border:"1.5px solid #e5e7eb",
+      borderRadius:9, fontSize:15, outline:"none", background:"white",
+      color:"#111827", boxSizing:"border-box", transition:"border-color .15s" },
+    onFocus: e => e.target.style.borderColor="#2563eb",
+    onBlur:  e => e.target.style.borderColor="#e5e7eb",
+  };
+
+  return (
+    <div style={{ minHeight:"100vh", background:"linear-gradient(135deg,#eff6ff 0%,#e0f2fe 50%,#f0f9ff 100%)",
+      display:"flex", alignItems:"center", justifyContent:"center", fontFamily:"system-ui,-apple-system,sans-serif", padding:16 }}>
+      <div style={{ background:"white", borderRadius:18, boxShadow:"0 24px 64px rgba(37,99,235,.12), 0 4px 16px rgba(0,0,0,.06)",
+        padding:40, width:"100%", maxWidth:420 }}>
+
+        <div style={{ textAlign:"center", marginBottom:32 }}>
+          <div style={{ width:60, height:60, background:"linear-gradient(135deg,#1d4ed8,#2563eb)",
+            borderRadius:16, display:"flex", alignItems:"center", justifyContent:"center",
+            margin:"0 auto 16px", boxShadow:"0 8px 24px rgba(37,99,235,.35)" }}>
+            <Heart size={28} color="white" fill="white" />
+          </div>
+          <h1 style={{ fontSize:26, fontWeight:800, color:"#111827", margin:"0 0 6px", letterSpacing:"-0.5px" }}>Cardio-Hub</h1>
+          <p style={{ fontSize:14, color:"#6b7280", margin:0 }}>Hệ thống hỗ trợ lâm sàng Tim mạch & Đột quỵ</p>
+        </div>
+
+        <form onSubmit={submit}>
+          <div style={{ marginBottom:14 }}>
+            <label style={{ display:"block", fontSize:13, fontWeight:600, color:"#374151", marginBottom:6 }}>Email bác sĩ</label>
+            <div style={{ position:"relative" }}>
+              <User size={15} color="#9ca3af" style={{ position:"absolute", left:12, top:"50%", transform:"translateY(-50%)", pointerEvents:"none" }} />
+              <input type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="bsnguyenvan@benhvien.vn" required {...inp} />
+            </div>
+          </div>
+          <div style={{ marginBottom:20 }}>
+            <label style={{ display:"block", fontSize:13, fontWeight:600, color:"#374151", marginBottom:6 }}>Mật khẩu</label>
+            <div style={{ position:"relative" }}>
+              <Lock size={15} color="#9ca3af" style={{ position:"absolute", left:12, top:"50%", transform:"translateY(-50%)", pointerEvents:"none" }} />
+              <input type="password" value={pw} onChange={e=>setPw(e.target.value)} placeholder="••••••••" required {...inp} />
+            </div>
+          </div>
+
+          {err && (
+            <div style={{ background:"#fef2f2", border:"1px solid #fecaca", borderRadius:9, padding:"10px 14px",
+              marginBottom:16, fontSize:13, color:"#b91c1c", display:"flex", gap:8, alignItems:"flex-start", lineHeight:1.5 }}>
+              <AlertTriangle size={15} style={{ flexShrink:0, marginTop:1 }} />
+              {err}
+            </div>
+          )}
+
+          <button type="submit" disabled={loading} style={{
+            width:"100%", background: loading ? "#93c5fd" : "linear-gradient(135deg,#1d4ed8,#2563eb)",
+            color:"white", border:"none", borderRadius:10, padding:"13px", fontSize:16, fontWeight:700,
+            cursor: loading ? "not-allowed" : "pointer", display:"flex", alignItems:"center",
+            justifyContent:"center", gap:8, boxShadow:"0 4px 14px rgba(37,99,235,.35)", letterSpacing:"-.2px" }}>
+            {loading ? <><Loader2 size={18} style={{animation:"spin .8s linear infinite"}} /> Đang xác thực...</> : "Đăng nhập"}
+          </button>
+        </form>
+
+        <div style={{ marginTop:18, background:"#f0f9ff", border:"1px solid #bae6fd", borderRadius:9,
+          padding:"10px 14px", fontSize:12.5, color:"#0369a1", textAlign:"center", lineHeight:1.6 }}>
+          <strong>Demo:</strong> Nhập bất kỳ email hợp lệ + mật khẩu ≥ 4 ký tự<br/>
+          <span style={{ color:"#7c3aed" }}>Production: Kết nối Supabase Auth</span>
+        </div>
+      </div>
+      <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
+    </div>
+  );
 }
 
-function openPatient(idx) {
-  currentPatientId = idx;
-  const p = patients[idx];
-  document.getElementById('pd-name').textContent = p.name;
-  document.getElementById('pd-info').textContent = `${p.age?p.age+' tuổi · ':''}${p.sex} · ${p.dx||'Chưa phân loại'}${p.pid?' · '+p.pid:''} · Nhập ${p.created}`;
-  document.getElementById('pd-note').value = p.note || '';
-  const sg = document.getElementById('pd-scores');
-  if(Object.keys(p.scores||{}).length) {
-    sg.innerHTML = Object.entries(p.scores).map(([k,v])=>`
-      <div class="pd-sc">
-        <div class="pd-sc-name">${k}</div>
-        <div class="pd-sc-val" style="color:${riskColor(v.risk)}">${v.val}</div>
-        <div class="pd-sc-risk" style="color:${riskColor(v.risk)}">${riskText(v.risk)}</div>
-        <div style="font-size:10px;color:var(--text4);margin-top:3px;font-family:var(--mono)">${v.date||''}</div>
-      </div>`).join('');
-  } else {
-    sg.innerHTML = '<div style="font-size:12px;color:var(--text3);padding:8px">Chưa có điểm nào. Tính điểm trong tab Bảng điểm rồi thêm vào đây.</div>';
-  }
-  const det = document.getElementById('pat-detail');
-  det.classList.add('show');
-  det.scrollIntoView({behavior:'smooth',block:'start'});
+// ═══════════════════════════════════════════════════════════
+// SIDEBAR
+// ═══════════════════════════════════════════════════════════
+function Sidebar({ page, setPage, user, onLogout }) {
+  const nav = [
+    { id:"home",      icon:Home,         label:"Tổng quan" },
+    { id:"scores",    icon:Activity,     label:"Tính điểm NIHSS" },
+    { id:"protocols", icon:Brain,        label:"Phác đồ Đột quỵ" },
+    { id:"drugs",     icon:Pill,         label:"Tra cứu thuốc" },
+    { id:"chat",      icon:MessageSquare,label:"Chat AI" },
+  ];
+  return (
+    <div style={{ position:"fixed", left:0, top:0, bottom:0, width:240,
+      background:"white", borderRight:"1px solid #e5e7eb", display:"flex",
+      flexDirection:"column", zIndex:100, boxShadow:"2px 0 12px rgba(0,0,0,.04)" }}>
+
+      <div style={{ padding:"20px 16px 16px", borderBottom:"1px solid #f3f4f6" }}>
+        <div style={{ display:"flex", alignItems:"center", gap:10 }}>
+          <div style={{ width:38, height:38, background:"linear-gradient(135deg,#1d4ed8,#2563eb)",
+            borderRadius:11, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+            <Heart size={20} color="white" fill="white" />
+          </div>
+          <div>
+            <div style={{ fontSize:16, fontWeight:800, color:"#111827", letterSpacing:"-.4px" }}>Cardio-Hub</div>
+            <div style={{ fontSize:11, color:"#6b7280", marginTop:1 }}>Tim mạch & Đột quỵ</div>
+          </div>
+        </div>
+      </div>
+
+      <nav style={{ flex:1, padding:"10px 8px", overflowY:"auto" }}>
+        <div style={{ fontSize:10, fontWeight:700, color:"#9ca3af", letterSpacing:"1px",
+          textTransform:"uppercase", padding:"4px 10px 8px" }}>Menu</div>
+        {nav.map(({ id, icon:Icon, label }) => {
+          const active = page === id;
+          return (
+            <button key={id} onClick={() => setPage(id)} style={{
+              width:"100%", display:"flex", alignItems:"center", gap:10, padding:"10px 12px",
+              borderRadius:10, border:"none", cursor:"pointer", marginBottom:2, textAlign:"left",
+              fontSize:14.5, fontWeight: active ? 600 : 400,
+              background: active ? "#eff6ff" : "transparent",
+              color: active ? "#1d4ed8" : "#374151",
+              transition:"all .15s"
+            }}>
+              <Icon size={18} strokeWidth={active ? 2.5 : 1.8} />
+              {label}
+              {active && <ChevronRight size={14} style={{ marginLeft:"auto" }} />}
+            </button>
+          );
+        })}
+      </nav>
+
+      <div style={{ padding:"12px 12px 16px", borderTop:"1px solid #f3f4f6" }}>
+        <div style={{ display:"flex", alignItems:"center", gap:10, padding:"10px 10px",
+          background:"#f8fafc", borderRadius:10, marginBottom:8 }}>
+          <div style={{ width:34, height:34, background:"linear-gradient(135deg,#dbeafe,#bfdbfe)",
+            borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+            <User size={16} color="#1d4ed8" />
+          </div>
+          <div style={{ overflow:"hidden", flex:1 }}>
+            <div style={{ fontSize:13.5, fontWeight:700, color:"#111827",
+              whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis", textTransform:"capitalize" }}>
+              {user.name}
+            </div>
+            <div style={{ fontSize:11, color:"#6b7280" }}>Bác sĩ</div>
+          </div>
+        </div>
+        <button onClick={onLogout} style={{
+          width:"100%", display:"flex", alignItems:"center", gap:8, padding:"9px 12px",
+          background:"transparent", border:"1px solid #e5e7eb", borderRadius:9,
+          cursor:"pointer", fontSize:13.5, color:"#6b7280", transition:"all .15s" }}
+          onMouseEnter={e=>{e.currentTarget.style.background="#fef2f2";e.currentTarget.style.color="#dc2626";e.currentTarget.style.borderColor="#fecaca"}}
+          onMouseLeave={e=>{e.currentTarget.style.background="transparent";e.currentTarget.style.color="#6b7280";e.currentTarget.style.borderColor="#e5e7eb"}}>
+          <LogOut size={15} /> Đăng xuất
+        </button>
+      </div>
+    </div>
+  );
 }
 
-function riskColor(r){
-  if(r==='vhigh') return 'var(--red2)';
-  if(r==='high') return 'var(--orange2)';
-  if(r==='mod') return 'var(--yellow2)';
-  return 'var(--green2)';
-}
-function riskText(r){
-  if(r==='vhigh') return 'Rất cao';
-  if(r==='high') return 'Cao';
-  if(r==='mod') return 'Trung bình';
-  return 'Thấp';
+// ═══════════════════════════════════════════════════════════
+// HOME PAGE
+// ═══════════════════════════════════════════════════════════
+function HomePage({ user, setPage }) {
+  const tiles = [
+    { id:"scores",    icon:Activity,     label:"Thang điểm NIHSS", desc:"15 mục đánh giá đột quỵ · 0–42 điểm · Auto-tổng hợp", color:"#1d4ed8", bg:"#eff6ff" },
+    { id:"protocols", icon:Brain,        label:"Phác đồ Đột quỵ",  desc:"Cửa sổ rtPA · Lấy huyết khối · Kiểm soát HA AHA/ASA", color:"#7c3aed", bg:"#f5f3ff" },
+    { id:"drugs",     icon:Pill,         label:"Tra cứu thuốc",    desc:"Alteplase · Labetalol · Nicardipine · Statin & hơn nữa", color:"#059669", bg:"#f0fdf4" },
+    { id:"chat",      icon:MessageSquare,label:"Chat AI Chuyên khoa",desc:"Trả lời dựa trên AHA/ASA · ESC · ACC Guidelines", color:"#d97706", bg:"#fffbeb" },
+  ];
+  const nihss = [
+    {r:"0",l:"Không ĐQ",bg:"#f0fdf4",c:"#166534"},{r:"1–4",l:"Nhẹ",bg:"#eff6ff",c:"#1e40af"},
+    {r:"5–15",l:"TB",bg:"#fefce8",c:"#713f12"},{r:"16–20",l:"TB–Nặng",bg:"#fff7ed",c:"#9a3412"},{r:"21–42",l:"Nặng",bg:"#fef2f2",c:"#991b1b"},
+  ];
+  return (
+    <div style={{ padding:"28px 32px", maxWidth:860, margin:"0 auto" }}>
+      <div style={{ marginBottom:24 }}>
+        <h1 style={{ fontSize:26, fontWeight:800, color:"#111827", margin:"0 0 6px", letterSpacing:"-.5px" }}>
+          Chào bác sĩ {user.name.split(" ").pop()} 👋
+        </h1>
+        <p style={{ fontSize:15, color:"#6b7280", margin:0 }}>Hệ thống hỗ trợ lâm sàng Tim mạch & Đột quỵ · ESC/AHA/ASA 2024</p>
+      </div>
+
+      <div style={{ background:"linear-gradient(135deg,#fef3c7,#fde68a)", border:"1px solid #fbbf24",
+        borderRadius:12, padding:"13px 18px", marginBottom:22, display:"flex", alignItems:"center", gap:12 }}>
+        <Clock size={20} color="#d97706" />
+        <div style={{ fontSize:14, color:"#78350f" }}>
+          <strong>Time is Brain</strong> — Mỗi giờ đột quỵ không điều trị ≈ <strong>120 triệu</strong> tế bào thần kinh bị mất.
+          Cửa sổ vàng rtPA: <strong style={{ color:"#b91c1c" }}>≤ 4.5 giờ</strong> · Door-to-needle: <strong style={{ color:"#b91c1c" }}>≤ 60 phút</strong>
+        </div>
+      </div>
+
+      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:14, marginBottom:22 }}>
+        {tiles.map(({ id, icon:Icon, label, desc, color, bg }) => (
+          <div key={id} onClick={() => setPage(id)}
+            style={{ background:"white", border:"1.5px solid #f1f5f9", borderRadius:14, padding:20, cursor:"pointer", transition:"all .2s" }}
+            onMouseEnter={e=>{e.currentTarget.style.boxShadow="0 8px 28px rgba(0,0,0,.1)";e.currentTarget.style.borderColor="#dbeafe";e.currentTarget.style.transform="translateY(-2px)"}}
+            onMouseLeave={e=>{e.currentTarget.style.boxShadow="none";e.currentTarget.style.borderColor="#f1f5f9";e.currentTarget.style.transform="none"}}>
+            <div style={{ width:46, height:46, background:bg, borderRadius:12, display:"flex", alignItems:"center", justifyContent:"center", marginBottom:12 }}>
+              <Icon size={23} color={color} />
+            </div>
+            <div style={{ fontSize:15.5, fontWeight:700, color:"#111827", marginBottom:5 }}>{label}</div>
+            <div style={{ fontSize:13, color:"#6b7280", lineHeight:1.5 }}>{desc}</div>
+            <div style={{ marginTop:12, fontSize:13, color, fontWeight:600, display:"flex", alignItems:"center", gap:4 }}>
+              Mở ngay <ChevronRight size={13} />
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div style={{ background:"white", border:"1px solid #e5e7eb", borderRadius:14, padding:20 }}>
+        <div style={{ fontSize:15, fontWeight:700, color:"#111827", marginBottom:14, display:"flex", alignItems:"center", gap:8 }}>
+          <BarChart3 size={17} color="#1d4ed8" /> Phân loại NIHSS nhanh
+        </div>
+        <div style={{ display:"flex", gap:8 }}>
+          {nihss.map(x => (
+            <div key={x.r} onClick={()=>setPage("scores")} style={{ flex:1, background:x.bg, borderRadius:10, padding:"11px 8px", textAlign:"center", cursor:"pointer" }}>
+              <div style={{ fontSize:17, fontWeight:800, color:x.c }}>{x.r}</div>
+              <div style={{ fontSize:12, fontWeight:600, color:x.c, marginTop:3 }}>{x.l}</div>
+            </div>
+          ))}
+        </div>
+        <div style={{ marginTop:12, fontSize:12, color:"#9ca3af", textAlign:"center" }}>
+          Nhấp vào ô bất kỳ để mở công cụ tính điểm NIHSS
+        </div>
+      </div>
+    </div>
+  );
 }
 
-function closePDetail() {
-  document.getElementById('pat-detail').classList.remove('show');
-  currentPatientId = null;
+// ═══════════════════════════════════════════════════════════
+// NIHSS CALCULATOR
+// ═══════════════════════════════════════════════════════════
+function NIHSSCalculator() {
+  const [scores, setScores] = useState({});
+  const [open, setOpen] = useState("1a");
+  const total = Object.values(scores).reduce((a,b)=>a+b,0);
+  const ip = nihssInterp(total);
+  const done = Object.keys(scores).length;
+
+  const pick = (id, val) => {
+    setScores(p => ({...p, [id]:val}));
+    const idx = NIHSS_ITEMS.findIndex(x=>x.id===id);
+    if (idx < NIHSS_ITEMS.length-1) setTimeout(()=>setOpen(NIHSS_ITEMS[idx+1].id),120);
+  };
+  const reset = () => { setScores({}); setOpen("1a"); };
+  const circ = 2 * Math.PI * 32;
+
+  return (
+    <div style={{ padding:"24px 28px", maxWidth:760, margin:"0 auto" }}>
+      <div style={{ display:"flex", alignItems:"flex-start", justifyContent:"space-between", marginBottom:20, flexWrap:"wrap", gap:12 }}>
+        <div>
+          <h1 style={{ fontSize:22, fontWeight:800, color:"#111827", margin:"0 0 4px", letterSpacing:"-.4px" }}>Thang điểm NIHSS</h1>
+          <p style={{ fontSize:14, color:"#6b7280", margin:0 }}>National Institutes of Health Stroke Scale · {done}/15 mục đã đánh giá</p>
+        </div>
+        <button onClick={reset} style={{ display:"flex", alignItems:"center", gap:6, padding:"8px 14px",
+          background:"white", border:"1.5px solid #e5e7eb", borderRadius:9, cursor:"pointer", fontSize:13.5, color:"#374151",
+          transition:"all .15s" }}
+          onMouseEnter={e=>{e.currentTarget.style.background="#f9fafb";e.currentTarget.style.borderColor="#d1d5db"}}
+          onMouseLeave={e=>{e.currentTarget.style.background="white";e.currentTarget.style.borderColor="#e5e7eb"}}>
+          <RefreshCw size={14}/> Đặt lại
+        </button>
+      </div>
+
+      {/* Score header */}
+      <div style={{ background:ip.bg, border:`2px solid ${ip.border}`, borderRadius:14, padding:"18px 22px",
+        marginBottom:20, display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+        <div>
+          <div style={{ fontSize:11, fontWeight:700, color:ip.color, textTransform:"uppercase", letterSpacing:"1px", marginBottom:4 }}>Tổng điểm NIHSS</div>
+          <div style={{ fontSize:56, fontWeight:900, color:ip.color, lineHeight:1, letterSpacing:"-2px" }}>{total}</div>
+          <div style={{ fontSize:15, fontWeight:700, color:ip.color, marginTop:4 }}>{ip.label}</div>
+          <div style={{ fontSize:13, color:ip.color, opacity:.8, marginTop:3, maxWidth:360 }}>{ip.sub}</div>
+        </div>
+        <svg width={80} height={80}>
+          <circle cx={40} cy={40} r={32} fill="none" stroke={ip.border} strokeWidth={5}/>
+          <circle cx={40} cy={40} r={32} fill="none" stroke={ip.ring} strokeWidth={5}
+            strokeDasharray={`${(done/15)*circ} ${circ}`}
+            strokeLinecap="round" transform="rotate(-90 40 40)"
+            style={{transition:"stroke-dasharray .4s ease"}}/>
+          <text x={40} y={37} textAnchor="middle" fontSize={15} fontWeight={800} fill={ip.color}>{done}</text>
+          <text x={40} y={52} textAnchor="middle" fontSize={11} fill={ip.color} opacity={.7}>/15</text>
+        </svg>
+      </div>
+
+      {/* Items */}
+      {NIHSS_ITEMS.map((item) => {
+        const isOpen = open === item.id;
+        const sel = scores[item.id];
+        const isDone = sel !== undefined;
+        return (
+          <div key={item.id} style={{ background:"white", border:`1.5px solid ${isDone?"#bfdbfe":"#e5e7eb"}`,
+            borderRadius:11, marginBottom:8, overflow:"hidden", transition:"border-color .15s" }}>
+            <button onClick={()=>setOpen(isOpen?null:item.id)} style={{
+              width:"100%", padding:"13px 16px", display:"flex", alignItems:"center", gap:12,
+              background:"transparent", border:"none", cursor:"pointer", textAlign:"left" }}>
+              <div style={{ width:30, height:30, borderRadius:"50%", flexShrink:0, display:"flex",
+                alignItems:"center", justifyContent:"center",
+                background: isDone ? "#2563eb" : "#f3f4f6" }}>
+                {isDone
+                  ? <CheckCircle size={17} color="white"/>
+                  : <span style={{ fontSize:10, fontWeight:600, color:"#9ca3af" }}>{item.id}</span>}
+              </div>
+              <div style={{ flex:1, minWidth:0 }}>
+                <div style={{ fontSize:14.5, fontWeight:600, color:"#111827" }}>{item.label}</div>
+                <div style={{ fontSize:12, color:"#6b7280", marginTop:2, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{item.note}</div>
+              </div>
+              {isDone && (
+                <div style={{ background:"#2563eb", color:"white", borderRadius:7, padding:"3px 9px",
+                  fontSize:14, fontWeight:800, flexShrink:0 }}>+{sel}</div>
+              )}
+              <ChevronDown size={16} color="#9ca3af" style={{ flexShrink:0, transform: isOpen?"rotate(180deg)":"none", transition:"transform .2s" }} />
+            </button>
+
+            {isOpen && (
+              <div style={{ padding:"4px 16px 14px 58px", borderTop:"1px solid #f3f4f6" }}>
+                <div style={{ fontSize:12, color:"#2563eb", background:"#eff6ff", borderRadius:7, padding:"7px 10px", marginBottom:10, lineHeight:1.5 }}>
+                  📋 {item.note}
+                </div>
+                {item.opts.map(([score, text]) => (
+                  <label key={score} style={{
+                    display:"flex", alignItems:"flex-start", gap:10, padding:"9px 12px",
+                    borderRadius:9, cursor:"pointer", marginBottom:4,
+                    background: sel===score?"#eff6ff":"transparent",
+                    border: sel===score?"1.5px solid #93c5fd":"1.5px solid transparent",
+                    transition:"all .1s"
+                  }}>
+                    <input type="radio" name={`n-${item.id}`} checked={sel===score}
+                      onChange={()=>pick(item.id,score)}
+                      style={{ marginTop:3, accentColor:"#2563eb", flexShrink:0 }}/>
+                    <span style={{ fontSize:14, color:"#374151", lineHeight:1.55 }}>
+                      <strong style={{ color:"#2563eb", fontFamily:"monospace", fontSize:15 }}>{score}</strong>
+                      <span style={{ color:"#9ca3af", margin:"0 6px" }}>—</span>
+                      {text}
+                    </span>
+                  </label>
+                ))}
+              </div>
+            )}
+          </div>
+        );
+      })}
+
+      {done === 15 && (
+        <div style={{ marginTop:16, background:"#f0fdf4", border:"1.5px solid #86efac", borderRadius:12, padding:18 }}>
+          <div style={{ fontSize:15, fontWeight:700, color:"#166534", marginBottom:8 }}>✅ Đánh giá hoàn tất · Gợi ý lâm sàng</div>
+          {total===0 && <p style={{ fontSize:14, color:"#166534", margin:0, lineHeight:1.6 }}>Không phát hiện thiếu sót thần kinh. Nếu nghi ngờ đột quỵ, xem xét lại tiền sử và thực hiện hình ảnh học (MRI DWI) để loại trừ đột quỵ nhỏ hoặc TIA.</p>}
+          {total>0&&total<=4 && <p style={{ fontSize:14, color:"#1e40af", margin:0, lineHeight:1.6 }}>Đột quỵ <strong>nhẹ</strong> — Cân nhắc rtPA nếu trong cửa sổ 4.5h và đủ tiêu chuẩn. Theo dõi sát tiến triển vì có thể "bướm lâm sàng" (fluctuating).</p>}
+          {total>4&&total<=15 && <p style={{ fontSize:14, color:"#713f12", margin:0, lineHeight:1.6 }}>Đột quỵ <strong>trung bình</strong> — Chỉ định rtPA nếu đủ tiêu chuẩn và trong 4.5h. Đánh giá hình ảnh học khẩn (CT/MRI + CTA). Nhập ICU/stroke unit.</p>}
+          {total>15&&total<=20 && <p style={{ fontSize:14, color:"#9a3412", margin:0, lineHeight:1.6 }}>Đột quỵ <strong>trung bình–nặng</strong> — Ưu tiên đánh giá lấy huyết khối cơ học (NIHSS ≥ 6). CTA/MRA khẩn để xác định tắc mạch lớn.</p>}
+          {total>20 && <p style={{ fontSize:14, color:"#991b1b", margin:0, lineHeight:1.6 }}>Đột quỵ <strong>nặng</strong> — Can thiệp lấy huyết khối cơ học là ưu tiên hàng đầu. Đánh giá lõi nhồi máu (ASPECTS, DWI). Cửa sổ 0–24h với hình ảnh học phù hợp (DAWN/DEFUSE 3).</p>}
+        </div>
+      )}
+    </div>
+  );
 }
 
-function savePatientNote() {
-  if(currentPatientId === null) return;
-  patients[currentPatientId].note = document.getElementById('pd-note').value;
-  savePatients();
-  showToast('✅ Đã lưu ghi chú');
+// ═══════════════════════════════════════════════════════════
+// STROKE PROTOCOL
+// ═══════════════════════════════════════════════════════════
+function StrokeProtocol() {
+  const [tab, setTab] = useState("rtpa");
+  const tabs = [
+    {id:"rtpa", label:"rtPA / Alteplase"},
+    {id:"thrombectomy", label:"Lấy huyết khối"},
+    {id:"bp", label:"Kiểm soát huyết áp"},
+    {id:"general", label:"Xử trí chung"},
+  ];
+  const Sec = ({children, title, color="#374151", bg="#f9fafb", border="#e5e7eb", icon}) => (
+    <div style={{ background:"white", border:`1.5px solid ${border}`, borderRadius:12, padding:18, marginBottom:14 }}>
+      <div style={{ fontSize:15, fontWeight:700, color, marginBottom:12, display:"flex", alignItems:"center", gap:8 }}>
+        {icon} {title}
+      </div>
+      {children}
+    </div>
+  );
+  const Item = ({ok, text}) => (
+    <div style={{ display:"flex", gap:9, alignItems:"flex-start", marginBottom:7, fontSize:14, color:"#374151" }}>
+      {ok ? <CheckCircle size={15} color="#16a34a" style={{ flexShrink:0, marginTop:2 }}/>
+           : <X size={15} color="#dc2626" style={{ flexShrink:0, marginTop:2 }}/>}
+      <span style={{ lineHeight:1.55 }}>{text}</span>
+    </div>
+  );
+
+  return (
+    <div style={{ padding:"24px 28px", maxWidth:820, margin:"0 auto" }}>
+      <div style={{ marginBottom:20 }}>
+        <h1 style={{ fontSize:22, fontWeight:800, color:"#111827", margin:"0 0 4px", letterSpacing:"-.4px" }}>Phác đồ Đột quỵ Thiếu máu Cục bộ Cấp tính</h1>
+        <p style={{ fontSize:14, color:"#6b7280", margin:0 }}>AHA/ASA Guidelines 2019 · 2021 Update · 2023 Focused Update</p>
+      </div>
+
+      {/* Time banner */}
+      <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:10, marginBottom:22 }}>
+        {[
+          {t:"⏱️ rtPA (Alteplase)",v:"≤ 4.5 giờ",note:"Door-to-needle ≤ 60 phút",c:"#dc2626",bg:"#fef2f2",b:"#fecaca"},
+          {t:"🧠 Lấy huyết khối",v:"≤ 24 giờ",note:"Chọn lọc — hình ảnh học phù hợp",c:"#7c3aed",bg:"#f5f3ff",b:"#ddd6fe"},
+          {t:"🚪 Door-to-Needle",v:"≤ 60 phút",note:"Mục tiêu: ≤ 45 phút (Class I)",c:"#d97706",bg:"#fffbeb",b:"#fde68a"},
+        ].map(x=>(
+          <div key={x.t} style={{ background:x.bg, border:`1.5px solid ${x.b}`, borderRadius:11, padding:"13px 14px", textAlign:"center" }}>
+            <div style={{ fontSize:12, color:x.c, fontWeight:600, marginBottom:4 }}>{x.t}</div>
+            <div style={{ fontSize:22, fontWeight:900, color:x.c, letterSpacing:"-1px" }}>{x.v}</div>
+            <div style={{ fontSize:11.5, color:x.c, opacity:.75, marginTop:3 }}>{x.note}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Tabs */}
+      <div style={{ display:"flex", gap:0, borderBottom:"2px solid #e5e7eb", marginBottom:18 }}>
+        {tabs.map(t=>(
+          <button key={t.id} onClick={()=>setTab(t.id)} style={{
+            padding:"10px 16px", border:"none", background:"transparent", cursor:"pointer",
+            fontSize:14, fontWeight: tab===t.id?700:400,
+            color: tab===t.id?"#1d4ed8":"#6b7280",
+            borderBottom: tab===t.id?"3px solid #2563eb":"3px solid transparent",
+            marginBottom:-2, transition:"all .15s", whiteSpace:"nowrap" }}>
+            {t.label}
+          </button>
+        ))}
+      </div>
+
+      {tab==="rtpa" && (
+        <div>
+          <Sec title="✅ Tiêu chuẩn chỉ định" color="#166534" bg="#f0fdf4" border="#86efac" icon={<CheckCircle size={17} color="#16a34a"/>}>
+            {["Chẩn đoán lâm sàng đột quỵ thiếu máu cục bộ","Khởi phát triệu chứng < 3 giờ (hoặc ≤ 4.5h trong trường hợp chọn lọc)","Tuổi ≥ 18","CT sọ não không có xuất huyết","NIHSS ≥ 4 hoặc triệu chứng vô hiệu hóa bất kể điểm số","Bệnh nhân / người đại diện hợp pháp đồng ý điều trị"].map((t,i)=><Item key={i} ok text={t}/>)}
+          </Sec>
+
+          <Sec title="⛔ Chống chỉ định tuyệt đối" color="#991b1b" bg="#fef2f2" border="#fecaca" icon={<AlertTriangle size={17} color="#dc2626"/>}>
+            {["Xuất huyết nội sọ trên CT/MRI","Đột quỵ hoặc chấn thương đầu nặng trong 3 tháng","Phẫu thuật nội sọ / tủy sống trong 3 tháng","Huyết áp ≥ 185/110 mmHg không kiểm soát được","INR > 1.7 hoặc đang dùng heparin với aPTT bất thường","Tiểu cầu < 100.000/mm³","Đường huyết < 50 mg/dL (2.7 mmol/L) chưa điều chỉnh","Ổ nhồi máu lớn > 1/3 bán cầu hoặc nhồi máu nhiều ổ trên hình ảnh"].map((t,i)=><Item key={i} ok={false} text={t}/>)}
+          </Sec>
+
+          <div style={{ background:"#eff6ff", border:"1.5px solid #bfdbfe", borderRadius:12, padding:18 }}>
+            <div style={{ fontSize:14, fontWeight:700, color:"#1e40af", marginBottom:10 }}>💉 Liều Alteplase (rtPA) — Class I, Level A</div>
+            <div style={{ background:"white", border:"1px solid #bfdbfe", borderRadius:9, padding:"13px 16px",
+              fontFamily:"monospace", fontSize:14, color:"#1e3a8a", lineHeight:2 }}>
+              <div><strong>Liều tổng:</strong> 0.9 mg/kg IV &nbsp;(tối đa <strong>90 mg</strong>)</div>
+              <div><strong>Bolus đầu tiên:</strong> 10% liều tổng → IV trong <strong>1 phút</strong></div>
+              <div><strong>Còn lại:</strong> 90% liều tổng → truyền IV trong <strong>60 phút</strong></div>
+              <div style={{ marginTop:8, padding:"8px 12px", background:"#eff6ff", borderRadius:7, fontFamily:"system-ui", fontSize:13, color:"#374151" }}>
+                📌 Ví dụ BN 70 kg → Tổng 63 mg → 6.3 mg bolus + 56.7 mg/60 phút
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {tab==="thrombectomy" && (
+        <div>
+          <Sec title="🧠 Chỉ định lấy huyết khối cơ học (Class I — AHA/ASA 2019)" color="#7c3aed" border="#ddd6fe" icon={<Brain size={17} color="#7c3aed"/>}>
+            {["NIHSS ≥ 6","Tắc mạch lớn tuần hoàn trước: ICA hoặc MCA đoạn M1 (xác nhận bằng CTA/MRA)","Cửa sổ 0 – 6 giờ từ khởi phát triệu chứng","ASPECTS ≥ 6 (CT không tương phản) — đủ nhu mô não còn sống","mRS trước đột quỵ ≤ 1 (không có tàn tật đáng kể từ trước)","rtPA không phải điều kiện bắt buộc trước can thiệp"].map((t,i)=><Item key={i} ok text={t}/>)}
+          </Sec>
+
+          <div style={{ background:"white", border:"1.5px solid #e5e7eb", borderRadius:12, padding:18, marginBottom:14 }}>
+            <div style={{ fontSize:15, fontWeight:700, color:"#374151", marginBottom:12 }}>🕐 Mở rộng cửa sổ 6–24h (Class IIa)</div>
+            {[
+              {trial:"DAWN Trial",crit:"≥ 80 tuổi + NIHSS ≥ 10; hoặc < 80 tuổi + NIHSS ≥ 10 với lõi DWI < 31 mL; hoặc < 80 tuổi + NIHSS ≥ 20 + lõi DWI < 51 mL"},
+              {trial:"DEFUSE 3 Trial",crit:"Tắc M1/ICA + Lõi nhồi máu < 70 mL + Tỉ lệ mismatch ≥ 1.8 + Thể tích vùng nguy cơ > 15 mL"},
+            ].map(x=>(
+              <div key={x.trial} style={{ background:"#f8fafc", borderRadius:9, padding:"11px 14px", marginBottom:8 }}>
+                <div style={{ fontSize:13, fontWeight:700, color:"#7c3aed", marginBottom:4 }}>{x.trial}</div>
+                <div style={{ fontSize:13.5, color:"#374151", lineHeight:1.55 }}>{x.crit}</div>
+              </div>
+            ))}
+            <div style={{ fontSize:13, color:"#6b7280", marginTop:8, padding:"8px 12px", background:"#fff7ed", borderRadius:7, border:"1px solid #fed7aa" }}>
+              ⚠️ Tắc tuần hoàn sau (basilar artery) — Không có cửa sổ thời gian cố định; xem xét từng ca với hình ảnh học đầy đủ.
+            </div>
+          </div>
+        </div>
+      )}
+
+      {tab==="bp" && (
+        <div>
+          <div style={{ background:"white", border:"1.5px solid #e5e7eb", borderRadius:12, padding:18, marginBottom:14, overflowX:"auto" }}>
+            <div style={{ fontSize:15, fontWeight:700, color:"#0369a1", marginBottom:14 }}>🩺 Mục tiêu huyết áp theo tình huống (AHA/ASA 2019)</div>
+            <table style={{ width:"100%", borderCollapse:"collapse", fontSize:13.5, minWidth:560 }}>
+              <thead>
+                <tr style={{ background:"#f0f9ff" }}>
+                  {["Tình huống","Mục tiêu HA","Thuốc ưu tiên","Ghi chú"].map(h=>(
+                    <th key={h} style={{ padding:"9px 12px", textAlign:"left", fontWeight:700, color:"#0369a1", borderBottom:"2px solid #bae6fd" }}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {[
+                  ["Trước rtPA","< 185/110 mmHg","Labetalol 10–20mg IV\nNicardipine 5mg/h IV","Đạt mục tiêu rồi mới bơm rtPA"],
+                  ["Trong/sau rtPA — 24h đầu","< 180/105 mmHg","Labetalol 10mg IV\nNicardipine 5–15mg/h","HA mỗi 15 phút × 2h đầu"],
+                  ["Không dùng rtPA/can thiệp","≤ 220/120 mmHg (trừ CCĐ)","Labetalol, Nicardipine","Không hạ quá 15% trong 1h đầu"],
+                  ["Sau lấy huyết khối thành công","< 180/105 mmHg","Nicardipine IV","Theo dõi sát 24h sau thủ thuật"],
+                  ["THA ác tính (> 220/120 kèm tổn thương cơ quan)","Hạ 15–20% trong 1h","Nicardipine, Labetalol, Clevidipine","Hạ từng bước — tránh hạ nhanh"],
+                ].map(([sit,tgt,drug,note],i)=>(
+                  <tr key={i} style={{ background: i%2===0?"white":"#f8fafc" }}>
+                    <td style={{ padding:"10px 12px", fontWeight:500, color:"#111827", borderBottom:"1px solid #f1f5f9" }}>{sit}</td>
+                    <td style={{ padding:"10px 12px", fontWeight:700, color:"#2563eb", fontFamily:"monospace", fontSize:13, borderBottom:"1px solid #f1f5f9" }}>{tgt}</td>
+                    <td style={{ padding:"10px 12px", color:"#374151", whiteSpace:"pre-line", fontSize:13, borderBottom:"1px solid #f1f5f9" }}>{drug}</td>
+                    <td style={{ padding:"10px 12px", color:"#6b7280", fontSize:12.5, borderBottom:"1px solid #f1f5f9" }}>{note}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {tab==="general" && (
+        <div style={{ background:"white", border:"1.5px solid #e5e7eb", borderRadius:12, padding:18 }}>
+          <div style={{ fontSize:15, fontWeight:700, color:"#111827", marginBottom:16 }}>📋 Xử trí chung trong 24–48h đầu</div>
+          {[
+            {h:"Hô hấp", items:["SpO₂ ≥ 94% — thở O₂ nếu thiếu oxy","Đặt NKQ khi GCS ≤ 8 hoặc không bảo vệ đường thở","Tránh tăng thông khí (PaCO₂ mục tiêu 35–45 mmHg)"]},
+            {h:"Thân nhiệt", items:["Paracetamol nếu sốt > 37.5°C","Tránh tăng thân nhiệt — làm nặng tổn thương não","Đánh giá nguyên nhân nhiễm trùng (viêm phổi, UTI)"]},
+            {h:"Đường huyết", items:["Mục tiêu 140–180 mg/dL (7.8–10 mmol/L)","Tránh hạ đường huyết < 60 mg/dL — gây tổn thương não","Insulin nếu > 180 mg/dL liên tục"]},
+            {h:"Nuốt & Dinh dưỡng", items:["Test nuốt (3oz nước) trước khi ăn uống","Sonde dạ dày nếu nuốt kém — phòng viêm phổi hít","Dinh dưỡng đường ruột sớm trong 24h nếu ổn định"]},
+            {h:"Thuốc & Dự phòng", items:["Aspirin 300 mg: ngay nếu không rtPA; sau 24h nếu đã rtPA","Không heparin thường quy trong 24–48h sau rtPA","DVT prophylaxis: băng áp lực, vận động sớm, LMWH sau 24–48h"]},
+            {h:"Phục hồi chức năng", items:["Bắt đầu PT/OT/ST trong 24–48h khi ổn định huyết động","Tránh nằm lâu bất động — phòng loét, viêm phổi, DVT","Đánh giá mRS và hoạt động chức năng trước xuất viện"]},
+          ].map(({h,items})=>(
+            <div key={h} style={{ marginBottom:14, paddingBottom:14, borderBottom:"1px solid #f3f4f6" }}>
+              <div style={{ fontSize:14, fontWeight:700, color:"#1d4ed8", marginBottom:7 }}>{h}</div>
+              {items.map((it,i)=>(
+                <div key={i} style={{ display:"flex", gap:8, alignItems:"flex-start", marginBottom:4, fontSize:14, color:"#374151" }}>
+                  <ChevronRight size={13} color="#2563eb" style={{ flexShrink:0, marginTop:3 }}/>{it}
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
 }
 
-function deletePatient() {
-  if(currentPatientId === null) return;
-  const name = patients[currentPatientId].name;
-  if(!confirm(`Xóa bệnh nhân "${name}"?`)) return;
-  patients.splice(currentPatientId, 1);
-  savePatients();
-  closePDetail();
-  renderPatients();
-  updateStats();
-  showToast('🗑️ Đã xóa: ' + name);
+// ═══════════════════════════════════════════════════════════
+// DRUG LOOKUP
+// ═══════════════════════════════════════════════════════════
+function DrugLookup() {
+  const [q, setQ] = useState("");
+  const [exp, setExp] = useState(null);
+  const filtered = DRUGS.filter(d =>
+    d.name.toLowerCase().includes(q.toLowerCase()) ||
+    d.cls.toLowerCase().includes(q.toLowerCase()) ||
+    d.ind.toLowerCase().includes(q.toLowerCase())
+  );
+  return (
+    <div style={{ padding:"24px 28px", maxWidth:760, margin:"0 auto" }}>
+      <div style={{ marginBottom:20 }}>
+        <h1 style={{ fontSize:22, fontWeight:800, color:"#111827", margin:"0 0 4px", letterSpacing:"-.4px" }}>Tra cứu Thuốc Tim mạch & Đột quỵ</h1>
+        <p style={{ fontSize:14, color:"#6b7280", margin:0 }}>Alteplase · Labetalol · Nicardipine · Aspirin · Enoxaparin · Statin</p>
+      </div>
+      <div style={{ position:"relative", marginBottom:16 }}>
+        <Stethoscope size={16} color="#9ca3af" style={{ position:"absolute", left:13, top:"50%", transform:"translateY(-50%)" }}/>
+        <input value={q} onChange={e=>setQ(e.target.value)}
+          placeholder="Tìm tên thuốc, nhóm thuốc, chỉ định..."
+          style={{ width:"100%", padding:"11px 14px 11px 38px", border:"1.5px solid #e5e7eb",
+            borderRadius:10, fontSize:15, outline:"none", background:"white",
+            color:"#111827", boxSizing:"border-box", transition:"border-color .15s" }}
+          onFocus={e=>e.target.style.borderColor="#2563eb"}
+          onBlur={e=>e.target.style.borderColor="#e5e7eb"}/>
+      </div>
+      {filtered.map(d=>(
+        <div key={d.name} style={{ background:"white", border:"1.5px solid #e5e7eb", borderRadius:12, marginBottom:10, overflow:"hidden", transition:"border-color .15s" }}
+          onMouseEnter={e=>e.currentTarget.style.borderColor="#bfdbfe"}
+          onMouseLeave={e=>e.currentTarget.style.borderColor="#e5e7eb"}>
+          <button onClick={()=>setExp(exp===d.name?null:d.name)} style={{
+            width:"100%", padding:"14px 18px", background:"transparent", border:"none",
+            cursor:"pointer", display:"flex", alignItems:"center", gap:13, textAlign:"left" }}>
+            <div style={{ width:11, height:11, borderRadius:"50%", background:d.color, flexShrink:0 }}/>
+            <div style={{ flex:1 }}>
+              <div style={{ fontSize:16, fontWeight:700, color:"#111827" }}>{d.name}</div>
+              <div style={{ fontSize:12, color:"#6b7280", marginTop:2 }}>{d.cls}</div>
+            </div>
+            <ChevronDown size={17} color="#9ca3af"
+              style={{ transform: exp===d.name?"rotate(180deg)":"none", transition:"transform .2s", flexShrink:0 }}/>
+          </button>
+          {exp===d.name && (
+            <div style={{ padding:"0 18px 16px", borderTop:"1px solid #f3f4f6" }}>
+              <table style={{ width:"100%", fontSize:14, borderCollapse:"collapse" }}>
+                {[["💉 Liều dùng",d.dose],["✅ Chỉ định",d.ind],["⛔ CCĐ",d.ci],["👁️ Theo dõi",d.mon]].map(([lbl,val])=>(
+                  <tr key={lbl} style={{ borderBottom:"1px solid #f3f4f6" }}>
+                    <td style={{ padding:"9px 14px 9px 0", fontWeight:700, color:"#374151", width:120, verticalAlign:"top", whiteSpace:"nowrap", fontSize:13 }}>{lbl}</td>
+                    <td style={{ padding:"9px 0", color:"#374151", lineHeight:1.65, whiteSpace:"pre-line" }}>{val}</td>
+                  </tr>
+                ))}
+              </table>
+            </div>
+          )}
+        </div>
+      ))}
+      {filtered.length===0 && <div style={{ textAlign:"center", padding:"40px 20px", color:"#9ca3af" }}>Không tìm thấy thuốc phù hợp</div>}
+    </div>
+  );
 }
 
-// ══════════════════════════════════════════════
-// TOAST
-// ══════════════════════════════════════════════
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2500);
+// ═══════════════════════════════════════════════════════════
+// AI CHAT — Anthropic API (Production: thay bằng Gemini API)
+// ═══════════════════════════════════════════════════════════
+const SYSTEM_PROMPT = `Bạn là chuyên gia Tim mạch và Đột quỵ hàng đầu. Chỉ trả lời dựa trên các hướng dẫn điều trị (Guidelines) chính thống của ESC, ACC, AHA, AHA/ASA.
+
+Nguyên tắc:
+- Ngắn gọn, đi thẳng vào vấn đề lâm sàng — không lan man
+- Trích dẫn guideline cụ thể (VD: AHA/ASA 2019, ESC 2021)
+- Dùng tiếng Việt y khoa chuẩn; thuật ngữ giải thích ngắn gọn khi cần
+- Với câu hỏi về liều thuốc: nêu rõ liều, đường dùng, cách theo dõi
+- Luôn nhắc nhở cuối câu trả lời: quyết định điều trị thuộc về bác sĩ phụ trách
+- Không trả lời ngoài lĩnh vực tim mạch và đột quỵ`;
+
+function AIChat() {
+  const [msgs, setMsgs] = useState([{role:"assistant",content:"Xin chào bác sĩ!\n\nTôi là trợ lý AI chuyên về **Tim mạch & Đột quỵ** — trả lời dựa trên AHA/ASA · ESC · ACC guidelines.\n\nBạn có thể hỏi tôi về:\n• Chỉ định, liều rtPA và lấy huyết khối\n• Phân tầng nguy cơ tim mạch (NIHSS, GRACE, CHA₂DS₂-VASc)\n• Xử trí tăng huyết áp trong đột quỵ cấp\n• Phác đồ rung nhĩ, suy tim, ACS"}]);
+  const [input, setInput] = useState("");
+  const [loading, setLoading] = useState(false);
+  const endRef = useRef(null);
+
+  useEffect(()=>endRef.current?.scrollIntoView({behavior:"smooth"}),[msgs]);
+
+  const send = async () => {
+    if (!input.trim() || loading) return;
+    const userText = input.trim();
+    setInput("");
+    const nextMsgs = [...msgs, {role:"user",content:userText}];
+    setMsgs(nextMsgs);
+    setLoading(true);
+    try {
+      const apiMsgs = nextMsgs
+        .filter((_,i)=> !(i===0))  // skip welcome
+        .map(m=>({role:m.role, content:m.content}));
+      const res = await fetch("https://api.anthropic.com/v1/messages",{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({
+          model:"claude-sonnet-4-20250514",
+          max_tokens:1000,
+          system:SYSTEM_PROMPT,
+          messages: apiMsgs,
+        })
+      });
+      const data = await res.json();
+      const text = data.content?.[0]?.text || "Xin lỗi, có lỗi xảy ra. Vui lòng thử lại.";
+      setMsgs(p=>[...p,{role:"assistant",content:text}]);
+    } catch {
+      setMsgs(p=>[...p,{role:"assistant",content:"⚠️ Lỗi kết nối. Kiểm tra internet và thử lại."}]);
+    }
+    setLoading(false);
+  };
+
+  const Bubble = ({msg,i}) => {
+    const isUser = msg.role==="user";
+    const parts = msg.content.split('\n');
+    return (
+      <div style={{ display:"flex", gap:10, marginBottom:18, justifyContent: isUser?"flex-end":"flex-start" }}>
+        {!isUser && (
+          <div style={{ width:34,height:34,background:"linear-gradient(135deg,#1d4ed8,#2563eb)",borderRadius:"50%",
+            display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,marginTop:2 }}>
+            <Bot size={17} color="white"/>
+          </div>
+        )}
+        <div style={{ maxWidth:"78%", padding:"12px 16px",
+          borderRadius: isUser?"18px 18px 4px 18px":"18px 18px 18px 4px",
+          background: isUser?"#2563eb":"white",
+          color: isUser?"white":"#111827",
+          border: isUser?"none":"1.5px solid #e5e7eb",
+          fontSize:14.5, lineHeight:1.65, boxShadow: isUser?"0 4px 14px rgba(37,99,235,.25)":"0 2px 8px rgba(0,0,0,.06)" }}>
+          {parts.map((line,j)=>{
+            const bold = line.replace(/\*\*(.*?)\*\*/g,"<strong>$1</strong>");
+            return <p key={j} style={{ margin: j===0?"0":"4px 0 0" }} dangerouslySetInnerHTML={{__html:bold}}/>;
+          })}
+        </div>
+        {isUser && (
+          <div style={{ width:34,height:34,background:"#e5e7eb",borderRadius:"50%",
+            display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,marginTop:2 }}>
+            <User size={17} color="#374151"/>
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  const quick = ["Chỉ định rtPA đột quỵ 3 tiếng?","Tiêu chuẩn lấy huyết khối cơ học","Xử trí HA trước khi dùng rtPA","NIHSS bao nhiêu cần can thiệp?","Phác đồ rung nhĩ ESC 2023"];
+
+  return (
+    <div style={{ display:"flex", flexDirection:"column", height:"calc(100vh - 0px)",
+      maxWidth:800, margin:"0 auto", padding:"20px 24px 0" }}>
+      <div style={{ marginBottom:14, flexShrink:0 }}>
+        <h1 style={{ fontSize:22, fontWeight:800, color:"#111827", margin:"0 0 4px", letterSpacing:"-.4px" }}>Chat AI Chuyên khoa</h1>
+        <p style={{ fontSize:14, color:"#6b7280", margin:0 }}>
+          <span style={{ background:"#eff6ff", color:"#1e40af", padding:"2px 8px", borderRadius:5, fontSize:12, fontWeight:600 }}>AHA/ASA</span>{" "}
+          <span style={{ background:"#f0fdf4", color:"#166534", padding:"2px 8px", borderRadius:5, fontSize:12, fontWeight:600 }}>ESC</span>{" "}
+          <span style={{ background:"#fef3c7", color:"#92400e", padding:"2px 8px", borderRadius:5, fontSize:12, fontWeight:600 }}>ACC</span>
+          <span style={{ color:"#9ca3af", marginLeft:8 }}>Trả lời dựa trên Guidelines</span>
+        </p>
+      </div>
+
+      <div style={{ flex:1, overflowY:"auto", paddingBottom:8 }}>
+        {msgs.map((m,i)=><Bubble key={i} msg={m} i={i}/>)}
+        {loading && (
+          <div style={{ display:"flex", gap:10, marginBottom:16 }}>
+            <div style={{ width:34,height:34,background:"linear-gradient(135deg,#1d4ed8,#2563eb)",borderRadius:"50%",
+              display:"flex",alignItems:"center",justifyContent:"center" }}>
+              <Bot size={17} color="white"/>
+            </div>
+            <div style={{ padding:"14px 18px",background:"white",border:"1.5px solid #e5e7eb",
+              borderRadius:"18px 18px 18px 4px",display:"flex",gap:5,alignItems:"center" }}>
+              {[0,1,2].map(j=>(
+                <div key={j} style={{ width:8,height:8,borderRadius:"50%",background:"#2563eb",
+                  animation:`dot 1.2s ease-in-out ${j*.2}s infinite` }}/>
+              ))}
+            </div>
+          </div>
+        )}
+        <div ref={endRef}/>
+      </div>
+
+      {msgs.length <= 1 && (
+        <div style={{ display:"flex", gap:7, flexWrap:"wrap", marginBottom:10, flexShrink:0 }}>
+          {quick.map(q=>(
+            <button key={q} onClick={()=>setInput(q)} style={{
+              padding:"7px 13px", background:"white", border:"1.5px solid #e5e7eb",
+              borderRadius:20, fontSize:13, color:"#374151", cursor:"pointer", transition:"all .15s",
+              whiteSpace:"nowrap" }}
+              onMouseEnter={e=>{e.currentTarget.style.borderColor="#2563eb";e.currentTarget.style.color="#1d4ed8";e.currentTarget.style.background="#eff6ff"}}
+              onMouseLeave={e=>{e.currentTarget.style.borderColor="#e5e7eb";e.currentTarget.style.color="#374151";e.currentTarget.style.background="white"}}>
+              {q}
+            </button>
+          ))}
+        </div>
+      )}
+
+      <div style={{ paddingBottom:20, flexShrink:0 }}>
+        <div style={{ display:"flex", gap:8, padding:"10px 12px",background:"white",
+          border:"1.5px solid #e5e7eb",borderRadius:14,
+          boxShadow:"0 4px 16px rgba(0,0,0,.07)",transition:"border-color .15s" }}
+          onFocus={e=>e.currentTarget.style.borderColor="#2563eb",{ capture:false }}
+          onBlur={e=>e.currentTarget.style.borderColor="#e5e7eb",{ capture:false }}>
+          <input value={input} onChange={e=>setInput(e.target.value)}
+            onKeyDown={e=>e.key==="Enter"&&!e.shiftKey&&(e.preventDefault(),send())}
+            placeholder="Hỏi về Tim mạch / Đột quỵ theo AHA/ASA, ESC guidelines..."
+            style={{ flex:1,border:"none",outline:"none",fontSize:15,color:"#111827",background:"transparent",padding:"4px 6px" }}
+            disabled={loading}/>
+          <button onClick={send} disabled={loading||!input.trim()} style={{
+            padding:"9px 16px",background: loading||!input.trim()?"#f3f4f6":"linear-gradient(135deg,#1d4ed8,#2563eb)",
+            color: loading||!input.trim()?"#9ca3af":"white",border:"none",borderRadius:10,
+            cursor: loading||!input.trim()?"not-allowed":"pointer",
+            display:"flex",alignItems:"center",gap:6,fontSize:14,fontWeight:700,
+            boxShadow: loading||!input.trim()?"none":"0 4px 12px rgba(37,99,235,.3)",
+            transition:"all .15s" }}>
+            <Send size={15}/> Gửi
+          </button>
+        </div>
+        <div style={{ fontSize:12,color:"#9ca3af",textAlign:"center",marginTop:8 }}>
+          ⚕️ AI hỗ trợ tham khảo — Không thay thế phán đoán lâm sàng của bác sĩ
+        </div>
+      </div>
+
+      <style>{`@keyframes dot{0%,60%,100%{transform:translateY(0);opacity:.5}30%{transform:translateY(-6px);opacity:1}}`}</style>
+    </div>
+  );
 }
 
-// ══════════════════════════════════════════════
-// INIT
-// ══════════════════════════════════════════════
-loadPatients();
+// ═══════════════════════════════════════════════════════════
+// MAIN APP — Route guard (production: dùng Supabase session)
+// ═══════════════════════════════════════════════════════════
+export default function CardioHub() {
+  const [user, setUser] = useState(null);
+  const [page, setPage] = useState("home");
 
-// Init radio buttons click
-document.querySelectorAll('.radio-wrap .rbtn').forEach(btn => {
-  btn.addEventListener('click', function() {
-    const wrap = this.closest('.radio-wrap');
-    wrap.querySelectorAll('.rbtn').forEach(b => b.classList.remove('on'));
-    this.classList.add('on');
-  });
-});
-</script>
-</body>
-</html>
+  // Production: kiểm tra Supabase session
+  // useEffect(()=>{ supabase.auth.getSession().then(({data:{session}})=>setUser(session?.user||null)); }, []);
+
+  if (!user) return <LoginPage onLogin={setUser} />;
+
+  return (
+    <div style={{ minHeight:"100vh", background:"#f8fafc", fontSize:16,
+      fontFamily:"system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" }}>
+      <Sidebar page={page} setPage={setPage} user={user} onLogout={()=>{setUser(null);setPage("home");}}/>
+      <div style={{ marginLeft:240, minHeight:"100vh" }}>
+        {page==="home"      && <HomePage user={user} setPage={setPage}/>}
+        {page==="scores"    && <NIHSSCalculator/>}
+        {page==="protocols" && <StrokeProtocol/>}
+        {page==="drugs"     && <DrugLookup/>}
+        {page==="chat"      && <AIChat/>}
+      </div>
+    </div>
+  );
+}
